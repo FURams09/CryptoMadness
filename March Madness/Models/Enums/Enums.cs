@@ -6,8 +6,8 @@ namespace March_Madness.Models
 		[Display(Name ="East")]
 		East = 1,
 
-		[Display(Name = "MidWest")]
-		MidWest = 2,
+		[Display(Name = "Midwest")]
+		Midwest = 2,
 
 		[Display(Name = "West")]
 		West = 3,

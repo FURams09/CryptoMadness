@@ -5,29 +5,30 @@ using System.Web;
 using System.Web.Mvc;
 using March_Madness.Models;
 using March_Madness.Models.ViewModels;
+using March_Madness.Helpers;
 
 namespace March_Madness.Controllers
 {
     public class TournamentController : Controller
     {
-		private ApplicationDbContext _context;
+        private ApplicationDbContext _context;
 
-		public TournamentController ()
-		{
-			_context = new ApplicationDbContext();
-		}
+        public TournamentController()
+        {
+            _context = new ApplicationDbContext();
+        }
         // GET: Tournament
         public ActionResult Index()
         {
-			var teamList = _context.Teams.OrderBy(t => t.Name);
+            var teamList = Utility.GetAllTeams();
 
-			var regions = Enum.GetNames(typeof(Regions));
+            var regions = Utility.GetRegionNames();
 
-			TournamentRegionViewModel tournamentRegionViewModel = new TournamentRegionViewModel()
-			{
-				Regions = regions.ToList(),
-				Teams = teamList.ToList()
-			};
+            TournamentRegionViewModel tournamentRegionViewModel = new TournamentRegionViewModel()
+            {
+                Regions = regions.ToList(),
+                Teams = teamList.ToList()
+            };
 
             return View("TournamentForm", tournamentRegionViewModel);
         }

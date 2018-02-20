@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Web.Mvc;
 using March_Madness.Models;
 using March_Madness.Models.ViewModels;
+using March_Madness.Helpers;
 
 namespace March_Madness.Controllers
 {
@@ -23,7 +24,7 @@ namespace March_Madness.Controllers
         // GET: Team
         public ActionResult Index()
         {
-			var teams = _context.Teams.OrderBy(t => t.Name);
+			var teams = Utility.GetAllTeams();
             return View(teams);
         }
 
@@ -34,7 +35,7 @@ namespace March_Madness.Controllers
 
 
 			var teamFormViewModel = new TeamFormViewModel() {
-				AllTeams = _context.Teams.OrderBy(t => t.Name).ToList()
+				AllTeams = Utility.GetAllTeams().ToList()
 			};
             return View("TeamForm", teamFormViewModel);
         }
@@ -58,7 +59,7 @@ namespace March_Madness.Controllers
         [HttpPost]
         public ActionResult Save(TeamModels teamModel)
         {
-			var allTeams = _context.Teams.OrderBy(t => t.Name);
+			var allTeams = Utility.GetAllTeams();
 			TeamFormViewModel tfViewModel;
 			try
             {
