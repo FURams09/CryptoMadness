@@ -20,6 +20,8 @@ namespace March_Madness.Models
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
+		public DbSet<TeamModels> Teams { get; set; }
+		public DbSet<TournamentTeamModel> TournamentTeam { get; set; }
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)
         {

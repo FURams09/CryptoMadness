@@ -1,0 +1,134 @@
+﻿@model March_Madness.Models.ViewModels.TournamentRegionViewModel
+@{
+	ViewBag.Title = "TournamentForm";
+}
+
+<h2>TournamentForm</h2>
+
+@foreach (var region in Model.Regions)
+{
+	<h2>@region</h2>
+	<div id="@region-containter" class="container sm-col-3">
+		<p style="display:inline;">1</p>
+		<select data-seed="1" data-region="@region"></select>
+		<br />
+
+		<p style="display:inline;">16</p>
+		<select data-seed="16" data-region="@region"><option /></select>
+		<br />
+		<br />
+
+		<p style="display:inline;">8</p>
+		<select data-seed="8" data-region="@region"></select>
+		<br />
+
+		<p style="display:inline;">9</p>
+		<select data-seed="9" data-region="@region"></select>
+		<br />
+		<br />
+
+		<p style="display:inline;">5</p>
+		<select data-seed="5" data-region="@region"></select>
+		<br />
+
+		<p style="display:inline;">12</p>
+		<select data-seed="12" data-region="@region"></select>
+		<br />
+		<br />
+
+		<p style="display:inline;">4</p>
+		<select data-seed="4" data-region="@region"></select>
+		<br />
+
+		<p style="display:inline;">13</p>
+		<select data-seed="13" data-region="@region"></select>
+		<br />
+		<br />
+
+		<p style="display:inline;">6</p>
+		<select data-seed="6" data-region="@region"></select>
+		<br />
+
+		<p style="display:inline;">11</p>
+		<select data-seed="11" data-region="@region"></select>
+		<br />
+		<br />
+
+		<p style="display:inline;">3</p>
+		<select data-seed="3" data-region="@region"></select>
+		<br />
+
+		<p style="display:inline;">14</p>
+		<select data-seed="14" data-region="@region"></select>
+		<br />
+		<br />
+
+		<p style="display:inline;">7</p>
+		<select data-seed="7" data-region="@region"></select>
+		<br />
+
+		<p style="display:inline;">10</p>
+		<select data-seed="10" data-region="@region"></select>
+		<br />
+		<br />
+
+		<p style="display:inline;">2</p>
+		<select data-seed="2" data-region="@region"></select>
+		<br />
+
+		<p style="display:inline;">15</p>
+		<select data-seed="15" data-region="@region"></select>
+		<br />
+		<br />
+	</div>
+
+}
+
+	@section scripts
+{
+		<script type="text/javascript">
+			var bracket = {
+				'East': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+				'MidWest': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+				'West': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+				'South': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+			}
+			$(function () {
+				var selectBoxes = $('select');
+
+				
+
+				selectBoxes.append('<option selected value value=0>Pick A Team</option>')
+				$.ajax({
+					url: '/api/teams',
+					method: 'GET',
+					success: function (d) {
+						$.each(d, function (i, school) {
+							selectBoxes.append('<option value=' + school.id + '>' + school.name + ' ' + school.mascot + '</option>')
+						})
+					},
+					failure: function (a, b, c) {
+						console.log(a, b, c);
+					}
+				});
+
+				selectBoxes.on('change', function () {
+					var $this = $(this);
+					if ($this.val() !== 0) {
+						var oldValue = bracket[$this.data('region')][$this.data('seed') - 1]
+
+						$.each(bracket, function (region, teams) {
+							let selectedTeamsOldSeed = teams.indexOf($this.val());
+							if (selectedTeamsOldSeed !== -1) {
+								$this.val(oldValue);
+								alert('Team already assigned to ' + region + ' ' + (parseInt(selectedTeamsOldSeed) + 1));
+								return false;
+							}
+						})
+
+						bracket[$this.data('region')][$this.data('seed') - 1] = $this.val();
+					};
+				});
+			})
+		</script>
+	}

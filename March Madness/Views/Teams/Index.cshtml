@@ -1,0 +1,65 @@
+﻿@model IEnumerable<March_Madness.Models.TeamModels>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Team Directory</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table" id="teams-table">
+	<tr>
+		<th>
+			@Html.DisplayNameFor(model => model.Name)
+		</th>
+		<th>
+			@Html.DisplayNameFor(model => model.Mascot)
+		</th>
+		<th></th>
+	</tr>
+
+	@foreach (var item in Model)
+	{
+		<tr>
+			<td>
+				@Html.DisplayFor(modelItem => item.Name)
+			</td>
+			<td>
+				@Html.DisplayFor(modelItem => item.Mascot)
+			</td>
+			<td>
+				<a class="btn btn-link btn-warning" href="/teams/edit/@item.Id">Edit</a>
+				<button class="btn btn-link btn-danger" data-team-id="@item.Id">Delete</button>
+			</td>
+		</tr>
+	}
+	</table>
+
+
+@section scripts
+{
+<script type="text/javascript">
+
+	$(function () {
+		$('#teams-table').on('click', '.btn-danger', function () {
+			$this = $(this);
+			$.ajax(
+				{
+					url: '/api/teams/' + $this.data('team-id'),
+					method: 'DELETE',
+					success: function () {
+						$this.parent().parent('tr').remove();
+					},
+					failure: function (a, b, c, d) {
+						alert('delete failed');
+						console.log(a, b, c);
+					}
+				}
+			)
+		})
+	})
+
+</script>
+}
