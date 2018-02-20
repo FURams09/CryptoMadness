@@ -21,11 +21,33 @@ namespace March_Madness.Controllers
         public ActionResult Index()
         {
             var teamList = Utility.GetAllTeams();
-
             var regions = Utility.GetRegionNames();
+
+
+            var seedOrder = _context.TournamentTeam
+                .OrderBy(t => t.Seed);
+            var east = seedOrder
+            .Where(t => t.Region == Regions.East)
+            .Select(t => t.TeamId );
+
+            var midwest = seedOrder
+            .Where(t => t.Region == Regions.Midwest)
+            .Select(t =>t.TeamId );
+
+            var west = seedOrder
+            .Where(t => t.Region == Regions.West)
+            .Select(t => t.TeamId );
+
+            var south = seedOrder
+            .Where(t => t.Region == Regions.South)
+            .Select(t =>  t.TeamId );
 
             TournamentRegionViewModel tournamentRegionViewModel = new TournamentRegionViewModel()
             {
+                East = east.ToList(),
+                Midwest = midwest.ToList(),
+                West = west.ToList(),
+                South = south.ToList(),
                 Regions = regions.ToList(),
                 Teams = teamList.ToList()
             };
