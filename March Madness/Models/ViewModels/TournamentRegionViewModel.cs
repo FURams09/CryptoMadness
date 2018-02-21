@@ -14,8 +14,6 @@ namespace March_Madness.Models.ViewModels
         public List<int> West { get; set; }
         public List<int> South { get; set; }
 
-        public List<string> Regions { get; set; }
-
         public List<TeamModels> Teams { get; set; }
 	
 	}

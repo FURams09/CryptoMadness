@@ -23,8 +23,8 @@ namespace March_Madness.Controllers.API
         [HttpPost]
         public IHttpActionResult SaveTournament(TournamentRegionViewModel bracket)
         {
-            try
-            {
+			try
+			{
                 for (int i = 1; i <= 4; i++)
                 {
                     switch (i)
@@ -44,27 +44,28 @@ namespace March_Madness.Controllers.API
                             UpdateBracketRegion(bracket.South, Regions.South);
                             break;
                     }
+					if (ModelState.IsValid)
+					{
+						_context.SaveChanges();
+						
+					}
+					else
+					{
+						return BadRequest();
+					}
                    
                 }
                
 
-                if (ModelState.IsValid)
-                {
-                    _context.SaveChanges();
-                    return Ok();
-                }
-                else
-                {
-                    return BadRequest();
-                }
+                
                 
             }
-            catch
-            {
-                return NotFound();
-            }
-
-        }
+			catch
+			{
+				return NotFound();
+			}
+			return Ok();
+		}
 
         private void UpdateBracketRegion(List<int> bracket, Regions region)
         {
