@@ -25,62 +25,86 @@
 		<script type="text/javascript" src="~/Scripts/jquery.bracket.js"></script>
 		<link rel="stylesheet" type="text/css" href="~/Content/jquery.bracket.css" />
 		<script type="text/javascript">
-			var minimalData = {
-				teams: [
-					["Team 1", "Team 2"], /* first matchup */
-					["Team 3", "Team 4"],  /* second matchup */
-					["Team 5", "Team 6"], /* first matchup */
-					["Team 7", "Team 8"],  /* second matchup */
-					["Team 9", "Team 10"], /* first matchup */
-					["Team 11", "Team 12"],  /* second matchup */
-					["Team 13", "Team 14"], /* first matchup */
-					["Team 15", "Team 16"]  /* second matchup */
-				],
-				results: [
-					[[1, 2], [3, 4]],       /* first round */
-					[[4, 6]]        /* second round */
-				]
-			}
+		    var minimalData = {
+		        teams: [
+		            ["Team 1", "Team 2"], /* first matchup */
+		            ["Team 3", "Team 4"], /* second matchup */
+		            ["Team 5", "Team 6"], /* first matchup */
+		            ["Team 7", "Team 8"], /* second matchup */
+		            ["Team 9", "Team 10"], /* first matchup */
+		            ["Team 11", "Team 12"], /* second matchup */
+		            ["Team 13", "Team 14"], /* first matchup */
+		            ["Team 15", "Team 16"] /* second matchup */
+		        ],
+		        results: [
+		            [[1, 2], [3, 4]], /* first round */
+		            [[4, 6]] /* second round */
+		        ]
+		    }
 
-			var semiFinal1 = {
-				teams: [["SF1", "SF2"]
-					, ["SF3", "SF4"]]
-			}
+		    var semiFinal1 = {
+		        teams: [["SF1", "SF2"], ["SF3", "SF4"]]
+		    }
 
-			var semiFinal2 = {
-				teams: []
-			}
+		    var semiFinal2 = {
+		        teams: []
+		    }
 
-			$(function () {
-				$('#crypto-madness-east').bracket({
-					init: minimalData, /* data to initialize the bracket with */
-					skipConsolationRound: true
-				})
+		    $(function() {
+		        $('#crypto-madness-east')
+		            .bracket({
+		                init: minimalData, /* data to initialize the bracket with */
+		                skipConsolationRound: true,
+		                save: function() {
+		                    console.log('saved');
+		                },
+		                disableToolbar: true,
+		                disableTeamEdit: true
+		            });
 
-				$('#crypto-madness-midwest').bracket({
-					init: minimalData, /* data to initialize the bracket with */
-					skipConsolationRound: true
-				})
+		        $('#crypto-madness-midwest')
+		            .bracket({
+		                init: minimalData, /* data to initialize the bracket with */
+		                skipConsolationRound: true,
+		                save: function () {
+		                    console.log('saved');
+		                },
+		                disableToolbar: true,
+		                disableTeamEdit: true
+		            })
 
-				$('#crypto-madness-west').bracket({
-					init: minimalData, /* data to initialize the bracket with */
-					skipConsolationRound: true,
-					dir: 'rl'
-				})
+		        $('#crypto-madness-west')
+		            .bracket({
+		                init: minimalData, /* data to initialize the bracket with */
+		                skipConsolationRound: true,
+		                dir: 'rl',
+		                save: function () {
+		                    console.log('saved');
+		                },
+		                disableToolbar: true,
+		                disableTeamEdit: true
+		            })
 
-				$('#crypto-madness-south').bracket({
-					init: minimalData, /* data to initialize the bracket with */
-					skipConsolationRound: true,
-					dir: 'rl'
-				})
+		        $('#crypto-madness-south')
+		            .bracket({
+		                init: minimalData, /* data to initialize the bracket with */
+		                skipConsolationRound: true,
+		                dir: 'rl',
+		                save: function() {
+		                    console.log('saved');
+		                },
+		                disableToolbar: true,
+		                disableTeamEdit: true
+		            });
 
-				$('#crypto-madness-semi1').bracket({
-					init: semiFinal1, /* data to initialize the bracket with */
-					skipConsolationRound: true,
-					isFinalFour: true
-				})
+		        $('#crypto-madness-semi1')
+		            .bracket({
+		                init: semiFinal1, /* data to initialize the bracket with */
+		                skipConsolationRound: true,
+		                isFinalFour: true
+		            })
 
-			})
+		    })
 		</script>
 
 	}

@@ -1012,51 +1012,54 @@ var __extends = (this && this.__extends) || (function () {
                 var rId_1 = resultId.get();
                 sEl.addClass("editable");
                 sEl.click(function () {
-                    var span = $(this);
-                    function editor() {
-                        span.unbind();
-                        var initialScore = !isNumber(team.score) ? "0" : span.text();
-                        var input = $('<input type="text">');
-                        input.val(initialScore);
-                        span.empty().append(input);
-                        input.focus().select();
-                        input.keydown(function (e) {
-                            if (!isNumber($(this).val())) {
-                                $(this).addClass("error");
-                            }
-                            else {
-                                $(this).removeClass("error");
-                            }
-                            var key = e.keyCode || e.which;
-                            if (key === 9 || key === 13 || key === 27) {
-                                e.preventDefault();
-                                $(this).blur();
-                                if (key === 27) {
-                                    return;
-                                }
-                                var next = topCon.find("div.score[data-resultid=result-" + (rId_1 + 1) + "]");
-                                if (next) {
-                                    next.click();
-                                }
-                            }
-                        });
-                        input.blur(function () {
-                            var val = input.val();
-                            if ((!val || !isNumber(val)) && !isNumber(team.score)) {
-                                val = "0";
-                            }
-                            else if ((!val || !isNumber(val)) && isNumber(team.score)) {
-                                val = team.score;
-                            }
-                            span.html(val);
-                            if (isNumber(val)) {
-                                team.score = Score.of(parseInt(val, 10));
-                                renderAll(true);
-                            }
-                            span.click(editor);
-                        });
-                    }
-                    editor();
+                    team.score = Score.of(parseInt(1, 10));
+                    opponent.score = Score.of(parseInt(0, 10));
+                    renderAll(true);
+                    //var span = $(this);
+                    //function editor() {
+                    //    span.unbind();
+                    //    var initialScore = !isNumber(team.score) ? "0" : span.text();
+                    //    var input = $('<input type="text">');
+                    //    input.val(initialScore);
+                    //    span.empty().append(input);
+                    //    input.focus().select();
+                    //    input.keydown(function (e) {
+                    //        if (!isNumber($(this).val())) {
+                    //            $(this).addClass("error");
+                    //        }
+                    //        else {
+                    //            $(this).removeClass("error");
+                    //        }
+                    //        var key = e.keyCode || e.which;
+                    //        if (key === 9 || key === 13 || key === 27) {
+                    //            e.preventDefault();
+                    //            $(this).blur();
+                    //            if (key === 27) {
+                    //                return;
+                    //            }
+                    //            var next = topCon.find("div.score[data-resultid=result-" + (rId_1 + 1) + "]");
+                    //            if (next) {
+                    //                next.click();
+                    //            }
+                    //        }
+                    //    });
+                    //    input.blur(function () {
+                    //        var val = input.val();
+                    //        if ((!val || !isNumber(val)) && !isNumber(team.score)) {
+                    //            val = "0";
+                    //        }
+                    //        else if ((!val || !isNumber(val)) && isNumber(team.score)) {
+                    //            val = team.score;
+                    //        }
+                    //        span.html(val);
+                    //        if (isNumber(val)) {
+                    //            team.score = Score.of(parseInt(val, 10));
+                    //            renderAll(true);
+                    //        }
+                    //        span.click(editor);
+                    //    });
+                    //}
+                    //editor();
                 });
             }
         }
