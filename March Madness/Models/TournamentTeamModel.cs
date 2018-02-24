@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace March_Madness.Models
 {
-	public class TournamentTeamModel
+	public class TournamentTeams
 	{
 		public int Id { get; set; }
 

@@ -353,12 +353,16 @@ var __extends = (this && this.__extends) || (function () {
                 return;
         }
     }
-    function winnerBubbles(match) {
+	function winnerBubbles(match) {
+		if (!match.opts.showWinnerBubble) return true;
         var el = match.el;
-        var winner = el.find(".team.win");
-        winner.append('<div class="bubble">1st</div>');
-        var loser = el.find(".team.lose");
-        loser.append('<div class="bubble">2nd</div>');
+		var winner = el.find(".team.win");
+		winner.append('<div class="bubble">1st</div>');
+
+
+		var loser = el.find(".team.lose")
+		loser.append('<div class="bubble">2ndt</div>');
+
         return true;
     }
     function consolationBubbles(match) {
@@ -752,6 +756,7 @@ var __extends = (this && this.__extends) || (function () {
                                 .winner();
                         }
                     },
+
                     {
                         source: function () {
                             return _this.bracket
@@ -1249,159 +1254,168 @@ var __extends = (this && this.__extends) || (function () {
         var data = opts.init;
         var isSingleElimination = data.results.length <= 1;
         // 45 === team height x2 + 1px margin
-        var height = data.teams.length * 45 + data.teams.length * opts.matchMargin;
-        var topCon = $('<div class="jQBracket ' + opts.dir + '"></div>').appendTo(opts.el.empty());
-        function resizeContainer() {
-            var roundCount = countRounds(data.teams.length, isSingleElimination, opts.skipGrandFinalComeback, opts.skipSecondaryFinal, data.results);
-            if (!opts.disableToolbar) {
-                topCon.css("width", roundCount * (opts.teamWidth + opts.scoreWidth + opts.roundMargin) +
-                    40);
-            }
-            else {
-                topCon.css("width", roundCount * (opts.teamWidth + opts.scoreWidth + opts.roundMargin) +
-                    10);
-            }
-            // reserve space for consolation round
-            if (isSingleElimination &&
-                data.teams.length <= 2 &&
-                !opts.skipConsolationRound) {
-                topCon.css("height", height + 40);
-            }
-        }
-        var w;
-        var l;
-        var f;
-        function renderAll(save) {
-            resultId.reset();
-            w.render();
-            if (l) {
-                l.render();
-            }
-            if (f && !opts.skipGrandFinalComeback) {
-                f.render();
-            }
-            if (!opts.disableHighlight) {
-                postProcess(topCon, w, f);
-            }
-            if (save) {
-                data.results[0] = w.results();
-                if (l) {
-                    data.results[1] = l.results();
-                }
-                if (f && !opts.skipGrandFinalComeback) {
-                    data.results[2] = f.results();
-                }
-                // Loser bracket comeback in finals might require a new round
-                resizeContainer();
-                if (opts.save) {
-                    opts.save(exportData(data), opts.userData);
-                }
-            }
-        }
-        if (opts.skipSecondaryFinal && isSingleElimination) {
-            $.error("skipSecondaryFinal setting is viable only in double elimination mode");
-        }
-        if (!opts.disableToolbar) {
-            embedEditButtons(topCon, data, opts);
-        }
-        var fEl;
-        var wEl;
-        var lEl;
-        if (isSingleElimination) {
-            wEl = $('<div class="bracket"></div>').appendTo(topCon);
-        }
-        else {
-            if (!opts.skipGrandFinalComeback) {
-                fEl = $('<div class="finals"></div>').appendTo(topCon);
-            }
-            wEl = $('<div class="bracket"></div>').appendTo(topCon);
-            lEl = $('<div class="loserBracket"></div>').appendTo(topCon);
-        }
-        wEl.css("height", height);
-        if (lEl) {
-            lEl.css("height", wEl.height() / 2);
-        }
-        resizeContainer();
-        var mkMatch = function (round, match, seed, results, renderCb, isFirstBracket, options) {
-            return new Match(round, match, seed, results, renderCb, isFirstBracket, options, resultId, topCon, renderAll);
-        };
-        w = new Bracket(wEl, Option.of(data.results[0] || null), mkMatch, true, opts);
-        if (!isSingleElimination) {
-            l = new Bracket(lEl, Option.of(data.results[1] || null), mkMatch, false, opts);
-            if (!opts.skipGrandFinalComeback) {
-                f = new Bracket(fEl, Option.of(data.results[2] || null), mkMatch, false, opts);
-            }
-        }
-        prepareWinners(w, data.teams, isSingleElimination, opts, opts.skipGrandFinalComeback && !isSingleElimination);
-        if (!isSingleElimination) {
-            prepareLosers(w, l, data.teams.length, opts.skipGrandFinalComeback, opts.centerConnectors);
-            if (!opts.skipGrandFinalComeback) {
-                prepareFinals(f, w, l, opts, topCon, resizeContainer);
-            }
-        }
-        renderAll(false);
-        return {
-            data: function () {
-                return exportData(opts.init);
-            }
-        };
-    };
-    function embedEditButtons(topCon, data, opts) {
-        var tools = $('<div class="tools"></div>').appendTo(topCon);
-        var inc = $('<span class="increment">+</span>').appendTo(tools);
-        inc.click(function () {
-            var len = data.teams.length;
-            for (var i = 0; i < len; i += 1) {
-                data.teams.push([Option.empty(), Option.empty()]);
-            }
-            return JqueryBracket(opts);
-        });
-        if ((data.teams.length > 1 && data.results.length === 1) ||
-            (data.teams.length > 2 && data.results.length === 3)) {
-            var dec = $('<span class="decrement">-</span>').appendTo(tools);
-            dec.click(function () {
-                if (data.teams.length > 1) {
-                    data.teams = data.teams.slice(0, data.teams.length / 2);
-                    return JqueryBracket(opts);
-                }
-            });
-        }
-        if (data.results.length === 1 && data.teams.length > 1) {
-            var type = $('<span class="doubleElimination">de</span>').appendTo(tools);
-            type.click(function () {
-                if (data.teams.length > 1 && data.results.length < 3) {
-                    data.results.push([], []);
-                    return JqueryBracket(opts);
-                }
-            });
-        }
-        else if (data.results.length === 3 && data.teams.length > 1) {
-            var type = $('<span class="singleElimination">se</span>').appendTo(tools);
-            type.click(function () {
-                if (data.results.length === 3) {
-                    data.results = data.results.slice(0, 1);
-                    return JqueryBracket(opts);
-                }
-            });
-        }
-    }
-    var assertNumber = function (opts, field) {
-        if (opts.hasOwnProperty(field)) {
-            var expectedType = "number";
-            var type = typeof opts[field];
-            if (type !== expectedType) {
-                throw new Error("Option \"" + field + "\" is " + type + " instead of " + expectedType);
-            }
-        }
-    };
-    var assertBoolean = function (opts, field) {
-        var value = opts[field];
-        var expectedType = "boolean";
-        var type = typeof value;
-        if (type !== expectedType) {
-            throw new Error("Value of " + field + " must be boolean, got " + expectedType + ", got " + type);
-        }
-    };
+		var height = data.teams.length * 45 + data.teams.length * opts.matchMargin;
+		var topCon = $('<div class="jQBracket ' + opts.dir + '"></div>').appendTo(opts.el.empty());
+		var arrTopCon = []
+		if (opts.isTwoSided) {
+			arrTopCon.push($('<div class="jQBracket lr"></div>').appendTo(opts.el));
+			arrTopCon.push($('<div class="jQBracket rl"></div>').appendTo(opts.el));
+		} else {
+			arrTopCon.push($('<div class="jQBracket ' + (opts.dir) + '"></div>').appendTo(opts.el));
+		}
+		
+
+		function resizeContainer() {
+			var roundCount = countRounds(data.teams.length, isSingleElimination, opts.skipGrandFinalComeback, opts.skipSecondaryFinal, data.results);
+			if (!opts.disableToolbar) {
+				topCon.css("width", roundCount * (opts.teamWidth + opts.scoreWidth + opts.roundMargin) +
+					40);
+			}
+			else {
+				topCon.css("width", roundCount * (opts.teamWidth + opts.scoreWidth + opts.roundMargin) +
+					10);
+			}
+			// reserve space for consolation round
+			if (isSingleElimination &&
+				data.teams.length <= 2 &&
+				!opts.skipConsolationRound) {
+				topCon.css("height", height + 40);
+			}
+		}
+		var w;
+		var l;
+		var f;
+		function renderAll(save) {
+			resultId.reset();
+			w.render();
+			if (l) {
+				l.render();
+			}
+			if (f && !opts.skipGrandFinalComeback) {
+				f.render();
+			}
+			if (!opts.disableHighlight) {
+				postProcess(topCon, w, f);
+			}
+			if (save) {
+				data.results[0] = w.results();
+				if (l) {
+					data.results[1] = l.results();
+				}
+				if (f && !opts.skipGrandFinalComeback) {
+					data.results[2] = f.results();
+				}
+				// Loser bracket comeback in finals might require a new round
+				resizeContainer();
+				if (opts.save) {
+					opts.save(exportData(data), opts.userData);
+				}
+			}
+		}
+		if (opts.skipSecondaryFinal && isSingleElimination) {
+			$.error("skipSecondaryFinal setting is viable only in double elimination mode");
+		}
+		if (!opts.disableToolbar) {
+			embedEditButtons(topCon, data, opts);
+		}
+		var fEl;
+		var wEl;
+		var lEl;
+		if (isSingleElimination) {
+			wEl = $('<div class="bracket"></div>').appendTo(topCon);
+		}
+		else {
+			if (!opts.skipGrandFinalComeback) {
+				fEl = $('<div class="finals"></div>').appendTo(topCon);
+			}
+			wEl = $('<div class="bracket"></div>').appendTo(topCon);
+			lEl = $('<div class="loserBracket"></div>').appendTo(topCon);
+		}
+		wEl.css("height", height);
+		if (lEl) {
+			lEl.css("height", wEl.height() / 2);
+		}
+		resizeContainer();
+		var mkMatch = function (round, match, seed, results, renderCb, isFirstBracket, options) {
+			return new Match(round, match, seed, results, renderCb, isFirstBracket, options, resultId, topCon, renderAll);
+		};
+		w = new Bracket(wEl, Option.of(data.results[0] || null), mkMatch, true, opts);
+		if (!isSingleElimination) {
+			l = new Bracket(lEl, Option.of(data.results[1] || null), mkMatch, false, opts);
+			if (!opts.skipGrandFinalComeback) {
+				f = new Bracket(fEl, Option.of(data.results[2] || null), mkMatch, false, opts);
+			}
+		}
+		prepareWinners(w, data.teams, isSingleElimination, opts, opts.skipGrandFinalComeback && !isSingleElimination);
+		if (!isSingleElimination) {
+			prepareLosers(w, l, data.teams.length, opts.skipGrandFinalComeback, opts.centerConnectors);
+			if (!opts.skipGrandFinalComeback) {
+				prepareFinals(f, w, l, opts, topCon, resizeContainer);
+			}
+		}
+		renderAll(false);
+		return {
+			data: function () {
+				return exportData(opts.init);
+			}
+		};
+	};
+	function embedEditButtons(topCon, data, opts) {
+		var tools = $('<div class="tools"></div>').appendTo(topCon);
+		var inc = $('<span class="increment">+</span>').appendTo(tools);
+		inc.click(function () {
+			var len = data.teams.length;
+			for (var i = 0; i < len; i += 1) {
+				data.teams.push([Option.empty(), Option.empty()]);
+			}
+			return JqueryBracket(opts);
+		});
+		if ((data.teams.length > 1 && data.results.length === 1) ||
+			(data.teams.length > 2 && data.results.length === 3)) {
+			var dec = $('<span class="decrement">-</span>').appendTo(tools);
+			dec.click(function () {
+				if (data.teams.length > 1) {
+					data.teams = data.teams.slice(0, data.teams.length / 2);
+					return JqueryBracket(opts);
+				}
+			});
+		}
+		if (data.results.length === 1 && data.teams.length > 1) {
+			var type = $('<span class="doubleElimination">de</span>').appendTo(tools);
+			type.click(function () {
+				if (data.teams.length > 1 && data.results.length < 3) {
+					data.results.push([], []);
+					return JqueryBracket(opts);
+				}
+			});
+		}
+		else if (data.results.length === 3 && data.teams.length > 1) {
+			var type = $('<span class="singleElimination">se</span>').appendTo(tools);
+			type.click(function () {
+				if (data.results.length === 3) {
+					data.results = data.results.slice(0, 1);
+					return JqueryBracket(opts);
+				}
+			});
+		}
+	}
+	var assertNumber = function (opts, field) {
+		if (opts.hasOwnProperty(field)) {
+			var expectedType = "number";
+			var type = typeof opts[field];
+			if (type !== expectedType) {
+				throw new Error("Option \"" + field + "\" is " + type + " instead of " + expectedType);
+			}
+		}
+	};
+	var assertBoolean = function (opts, field) {
+		var value = opts[field];
+		var expectedType = "boolean";
+		var type = typeof value;
+		if (type !== expectedType) {
+			throw new Error("Value of " + field + " must be boolean, got " + expectedType + ", got " + type);
+		}
+	};
     var assertGt = function (expected, opts, field) {
         var value = opts[field];
         if (value < expected) {
@@ -1512,12 +1526,18 @@ var __extends = (this && this.__extends) || (function () {
             }
             var bracket = JqueryBracket(opts);
             $(this).data("bracket", { target: this, obj: bracket });
-            return bracket;
+			return bracket;
+
+			opts.showFinalBubble === false ? false : true; //only set to false if explicitly declared as false.
+
+			opts.isTwoSided = opts.isTwoSided || false;
+
+			opts.regions = opts.regions || 1;
         },
         data: function () {
             var bracket = $(this).data("bracket");
-            return bracket.obj.data();
-        }
+			return bracket.obj.data();
+		}
     };
     $.fn.bracket = function (method) {
         if (methods[method]) {

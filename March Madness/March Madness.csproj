@@ -228,6 +228,10 @@
     <Compile Include="Migrations\201802200351140_Created TournamentTeamModel.Designer.cs">
       <DependentUpon>201802200351140_Created TournamentTeamModel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201802242213142_Rename TournamentTeamModels to TournamentTeams.cs" />
+    <Compile Include="Migrations\201802242213142_Rename TournamentTeamModels to TournamentTeams.Designer.cs">
+      <DependentUpon>201802242213142_Rename TournamentTeamModels to TournamentTeams.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Enums\Enums.cs" />
     <Compile Include="Models\TournamentTeamModel.cs" />
@@ -311,6 +315,7 @@
     <Content Include="Scripts\umd\popper-utils.min.js" />
     <Content Include="Scripts\umd\popper.js" />
     <Content Include="Scripts\umd\popper.min.js" />
+    <Content Include="Scripts\Utility.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -384,6 +389,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201802200351140_Created TournamentTeamModel.resx">
       <DependentUpon>201802200351140_Created TournamentTeamModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802242213142_Rename TournamentTeamModels to TournamentTeams.resx">
+      <DependentUpon>201802242213142_Rename TournamentTeamModels to TournamentTeams.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

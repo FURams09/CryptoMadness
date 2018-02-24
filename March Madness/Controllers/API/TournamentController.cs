@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using March_Madness.Models;
 using March_Madness.Models.ViewModels;
+using March_Madness.Helpers;
 
 
 namespace March_Madness.Controllers.API
@@ -76,7 +77,7 @@ namespace March_Madness.Controllers.API
 
                 if (oldTeam == null)
                 {
-                    var newTeam = new TournamentTeamModel()
+                    var newTeam = new TournamentTeams()
                     {
                         TeamId = teamId,
                         Region = region,
@@ -91,7 +92,26 @@ namespace March_Madness.Controllers.API
                 }
             }
         }
-    }
+
+		[Route("api/bracket")]
+		public IHttpActionResult  GetTournament()
+		{
+			try
+			{
+				var utl = new Utility();
+
+				return Ok(utl.GetBracket());
+
+
+
+
+			}
+			catch
+			{
+				return NotFound();
+			}
+		}
+	}
 
     
 }

@@ -48,6 +48,7 @@ namespace March_Madness.Controllers
                 Midwest = midwest.ToList(),
                 West = west.ToList(),
                 South = south.ToList(),
+				Round1PairingOrder = Utility.Round1PairingOrder,
                 Teams = teamList.ToList()
             };
 
