@@ -15,16 +15,18 @@ namespace March_Madness.Controllers
     {
 
 		private ApplicationDbContext _context;
+		private Utility _utility;
 
 		public TeamsController()
 		{
 			_context = new ApplicationDbContext();
+			_utility = new Utility();
 		}
 
         // GET: Team
         public ActionResult Index()
         {
-			var teams = Utility.GetAllTeams();
+			var teams = _utility.GetAllTeams();
             return View(teams);
         }
 
@@ -35,7 +37,7 @@ namespace March_Madness.Controllers
 
 
 			var teamFormViewModel = new TeamFormViewModel() {
-				AllTeams = Utility.GetAllTeams().ToList()
+				AllTeams = _utility.GetAllTeams().ToList()
 			};
             return View("TeamForm", teamFormViewModel);
         }
@@ -59,7 +61,7 @@ namespace March_Madness.Controllers
         [HttpPost]
         public ActionResult Save(TeamModels teamModel)
         {
-			var allTeams = Utility.GetAllTeams();
+			var allTeams = _utility.GetAllTeams();
 			TeamFormViewModel tfViewModel;
 			try
             {

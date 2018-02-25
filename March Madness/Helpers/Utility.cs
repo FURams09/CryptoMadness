@@ -9,7 +9,12 @@ namespace March_Madness.Helpers
 {
 	public class Utility
 	{
-		private static ApplicationDbContext _context = new ApplicationDbContext();
+		private ApplicationDbContext _context;
+
+		public Utility()
+		{
+			_context = new ApplicationDbContext();
+		}
 
 		public static List<int> Round1PairingOrder = new List<int>() { 1, 16, 8, 9, 5, 12, 4, 13, 6, 11, 3, 14, 7, 10, 2, 15 };
 
@@ -18,7 +23,7 @@ namespace March_Madness.Helpers
 			return Enum.GetNames(typeof(Regions)).ToList();
 		}
 
-		public static IQueryable<TeamModels> GetAllTeams()
+		public IQueryable<TeamModels> GetAllTeams()
 		{
 			return _context.Teams.OrderBy(t => t.Name);
 		}

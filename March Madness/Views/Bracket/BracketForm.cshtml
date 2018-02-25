@@ -5,17 +5,17 @@
 
 <h2>Bracket Form</h2>
 <div class="row">
-	<div class="col-md-5">
-		<div id="crypto-madness-east" style="height: 260px;"></div>
-		<div id="crypto-madness-midwest" style="height: 260px;"></div>
+	<div 
+</div>
+<div class="row">
+	<div class="col-md-11">
+		<div id="crypto-madness" style="height: 260px;"></div>
+		
 	</div>
-	<div class="col-md-2 container">
-		<div id="crypto-madness-semi" style="top: 260px"></div>
+	<div style="z-index:99999;">
+		<button class="btn btn-primary btn-success" id="submitBracket" >Enter</button>
 	</div>
-	<div class="col-md-5">
-		<div id="crypto-madness-west" style="height: 260px;"></div>
-		<div id="crypto-madness-south" style="height: 260px;"></div>
-	</div>
+
 
 </div>
 
@@ -40,18 +40,26 @@
 				results: [] /* second round */
 				
 			}
-			$('#crypto-madness-east')
+			$('#crypto-madness')
 				.bracket({
 					init: minimalData, /* data to initialize the bracket with */
 					skipConsolationRound: true,
 					save: bracketSave,
 					disableToolbar: true,
 					disableTeamEdit: true,
-					isTwoSided: false,
-					regions: 4,
+					teamWidth: 150,
+					scoreWidth: 0,
 					showFinalBubble: false
 				});
 
+
+			$('#submitBracket').on('click', function () {
+				if ($('.highlightWinner').length > 0 && $('.highlightWinner .highlight').length === 0) {
+					var results = $('#crypto-madness').bracket('data').results;
+				} else {
+					alert('All games must be selected.');
+				}
+			});
 			//$('#crypto-madness-midwest')
 			//    .bracket({
 			//        init: minimalData, /* data to initialize the bracket with */

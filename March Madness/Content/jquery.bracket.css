@@ -48,7 +48,8 @@ div.jQBracket {
     z-index: 1;
     float: left;
     background-color: #eee;
-    cursor: default; }
+    cursor: default;
+    height: 25px; }
     div.jQBracket .team:first-child {
       border-bottom: 1px solid #999; }
     div.jQBracket .team input {

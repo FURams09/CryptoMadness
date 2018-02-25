@@ -12,15 +12,17 @@ namespace March_Madness.Controllers
     public class TournamentController : Controller
     {
         private ApplicationDbContext _context;
+		private Utility _utility;
 
         public TournamentController()
         {
             _context = new ApplicationDbContext();
+			_utility = new Utility();
         }
         // GET: Tournament
         public ActionResult Index()
         {
-            var teamList = Utility.GetAllTeams();
+            var teamList = _utility.GetAllTeams();
             var regions = Utility.GetRegionNames();
 
 

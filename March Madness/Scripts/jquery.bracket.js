@@ -1,3 +1,4 @@
+
 /**
  * jQuery Bracket
  *
@@ -969,10 +970,10 @@ var __extends = (this && this.__extends) || (function () {
             ? Option.empty()
             : team.score.map(function (s) { return "" + s; });
         var scoreString = score.orElse("--");
-        sEl.text(scoreString);
+       // sEl.text(scoreString);
         var tEl = $("<div class=\"team\" style=\"width: " + (opts.teamWidth +
             opts.scoreWidth) + "px;\"></div>");
-        var nEl = $("<div class=\"label\" style=\"width: " + opts.teamWidth + "px;\"></div>").appendTo(tEl);
+        var nEl = $("<div class=\"label score\" style=\"width: " + opts.teamWidth + "px;\"></div>").appendTo(tEl);
         opts.decorator.render(nEl, team.name.toNull(), scoreString, teamState(team, opponent, score));
         team.seed.forEach(function (seed) {
             tEl.attr("data-teamid", seed);
@@ -1016,7 +1017,7 @@ var __extends = (this && this.__extends) || (function () {
             if (!team.name.isEmpty() && !opponent.name.isEmpty() && isReady) {
                 var rId_1 = resultId.get();
                 sEl.addClass("editable");
-                sEl.click(function () {
+                nEl.click(function () {
                     team.score = Score.of(parseInt(1, 10));
                     opponent.score = Score.of(parseInt(0, 10));
                     renderAll(true);
@@ -1256,13 +1257,6 @@ var __extends = (this && this.__extends) || (function () {
         // 45 === team height x2 + 1px margin
 		var height = data.teams.length * 45 + data.teams.length * opts.matchMargin;
 		var topCon = $('<div class="jQBracket ' + opts.dir + '"></div>').appendTo(opts.el.empty());
-		var arrTopCon = []
-		if (opts.isTwoSided) {
-			arrTopCon.push($('<div class="jQBracket lr"></div>').appendTo(opts.el));
-			arrTopCon.push($('<div class="jQBracket rl"></div>').appendTo(opts.el));
-		} else {
-			arrTopCon.push($('<div class="jQBracket ' + (opts.dir) + '"></div>').appendTo(opts.el));
-		}
 		
 
 		function resizeContainer() {
@@ -1530,9 +1524,6 @@ var __extends = (this && this.__extends) || (function () {
 
 			opts.showFinalBubble === false ? false : true; //only set to false if explicitly declared as false.
 
-			opts.isTwoSided = opts.isTwoSided || false;
-
-			opts.regions = opts.regions || 1;
         },
         data: function () {
             var bracket = $(this).data("bracket");
