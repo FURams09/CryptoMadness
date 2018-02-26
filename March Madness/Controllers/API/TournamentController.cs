@@ -20,97 +20,130 @@ namespace March_Madness.Controllers.API
             _context = new ApplicationDbContext();
         }
 
+
+		[Route("api/tournament")]
+		[HttpGet]
+		public IHttpActionResult GetTournament()
+		{
+			var _utility = new Utility();
+			var teamList = _utility.GetAllTeams();
+			var regions = Utility.GetRegionNames();
+
+
+			var seededOrder = _context.TournamentTeam
+				.OrderBy(t => t.Seed);
+			var east = seededOrder
+			.Where(t => t.Region == Regions.East)
+			.Select(t => new { t.Seed, t.TeamId });
+
+			var midwest = seededOrder
+			.Where(t => t.Region == Regions.Midwest)
+			.Select(t => new { t.Seed, t.TeamId });
+
+			var west = seededOrder
+			.Where(t => t.Region == Regions.West)
+			.Select(t => new { t.Seed, t.TeamId });
+
+			var south = seededOrder
+			.Where(t => t.Region == Regions.South)
+			.Select(t => new { t.Seed, t.TeamId });
+
+			var bracket = new Dictionary<string, Dictionary<int, int>>();
+			bracket.Add("east", east.ToDictionary(t => t.Seed, t => t.TeamId));
+			bracket.Add("midwest", midwest.ToDictionary(t => t.Seed, t => t.TeamId));
+			bracket.Add("west", west.ToDictionary(t => t.Seed, t => t.TeamId));
+			bracket.Add("south", south.ToDictionary(t => t.Seed, t => t.TeamId));
+
+			TournamentRegionViewModel tournamentRegionViewModel = new TournamentRegionViewModel()
+			{
+				Bracket= bracket,
+				Round1PairingOrder = Utility.Round1PairingOrder,
+				Teams = teamList.ToList()
+			};
+
+			return Ok(tournamentRegionViewModel);
+		}
+
         [Route("api/tournament")]
         [HttpPost]
-        public IHttpActionResult SaveTournament(TournamentRegionViewModel bracket)
+        public IHttpActionResult SaveTournament(Dictionary<string, Dictionary<int, int>> bracket)
         {
 			try
 			{
-                for (int i = 1; i <= 4; i++)
-                {
-                    switch (i)
-                    {
-                        case 1:
-                            UpdateBracketRegion(bracket.East, Regions.East);
-                            break;
-                        case 2:
-                            UpdateBracketRegion(bracket.Midwest, Regions.Midwest);
-                            break;
-
-                        case 3:
-                            UpdateBracketRegion(bracket.West, Regions.West);
-                            break;
-
-                        case 4:
-                            UpdateBracketRegion(bracket.South, Regions.South);
-                            break;
-                    }
-					if (ModelState.IsValid)
-					{
-						_context.SaveChanges();
-						
-					}
-					else
-					{
-						return BadRequest();
-					}
+				UpdateBracketRegion(bracket["east"], Regions.East);
+                      
+                UpdateBracketRegion(bracket["midwest"], Regions.Midwest);
+                           
+                UpdateBracketRegion(bracket["west"], Regions.West);
+                           
+                UpdateBracketRegion(bracket["south"], Regions.South);
+                           
+				if (ModelState.IsValid)
+				{
+					_context.SaveChanges();
+				}
+				else
+				{
+					return BadRequest();
+				}
                    
-                }
-               
-
-                
-                
             }
-			catch
+
+			catch (Exception ex)
 			{
+				var nds = ex;
 				return NotFound();
 			}
 			return Ok();
 		}
 
-        private void UpdateBracketRegion(List<int> bracket, Regions region)
+        private void UpdateBracketRegion(Dictionary<int, int> bracket, Regions region)
         {
-            for (int i = 0; i < bracket.Count; i++)
+            foreach (var teamAndseed in bracket)
             {
-                var teamId = bracket[i];
-                var oldTeam = _context.TournamentTeam.SingleOrDefault(t => (t.Seed == i + 1) && t.Region == region);
+                var teamId = teamAndseed.Value;
+                
+				if (teamId != 0)
+				{
+					var oldTeam = _context.TournamentTeam.SingleOrDefault(t => (t.Seed == teamAndseed.Key) && t.Region == region);
+					if (oldTeam == null  )
+					{
+						var newTeam = new TournamentTeams()
+						{
+							TeamId = teamId,
+							Region = region,
+							Seed = teamAndseed.Key
+						};
 
-                if (oldTeam == null)
-                {
-                    var newTeam = new TournamentTeams()
-                    {
-                        TeamId = teamId,
-                        Region = region,
-                        Seed = i + 1
-                    };
-
-                    _context.TournamentTeam.Add(newTeam);
-                }
-                else
-                {
-                    oldTeam.TeamId = teamId;
-                }
+						_context.TournamentTeam.Add(newTeam);
+					}
+					else
+					{
+						oldTeam.TeamId = teamId;
+					}
+				}
+                
             }
         }
 
-		[Route("api/bracket")]
-		public IHttpActionResult  GetTournament()
-		{
-			try
-			{
-				var utl = new Utility();
+		//[Route("api/bracket")]
+		//public IHttpActionResult  GetTournament()
+		//{
+		//	try
+		//	{
+		//		var utl = new Utility();
 
-				return Ok(utl.GetBracket());
-
-
+		//		return Ok(utl.GetBracket());
 
 
-			}
-			catch
-			{
-				return NotFound();
-			}
-		}
+
+
+		//	}
+		//	catch
+		//	{
+		//		return NotFound();
+		//	}
+		//}
 	}
 
     

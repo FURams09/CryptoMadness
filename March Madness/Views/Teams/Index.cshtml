@@ -1,4 +1,4 @@
-﻿@model IEnumerable<March_Madness.Models.TeamModels>
+﻿@model IEnumerable<March_Madness.Models.Teams>
 
 @{
     ViewBag.Title = "Index";
@@ -15,25 +15,26 @@
 			@Html.DisplayNameFor(model => model.Name)
 		</th>
 		<th>
-			@Html.DisplayNameFor(model => model.Mascot)
+			@Html.DisplayNameFor(model => model.DisplayName)
 		</th>
 		<th></th>
 	</tr>
 
 	@foreach (var item in Model)
 	{
-		<tr>
-			<td>
-				@Html.DisplayFor(modelItem => item.Name)
-			</td>
-			<td>
-				@Html.DisplayFor(modelItem => item.Mascot)
-			</td>
-			<td>
-				<a class="btn btn-link btn-warning" href="/teams/edit/@item.Id">Edit</a>
-				<button class="btn btn-link btn-danger" data-team-id="@item.Id">Delete</button>
-			</td>
-		</tr>
+	<tr>
+		<td>
+			@Html.DisplayFor(modelItem => item.Name)
+		</td>
+		<td>
+			@Html.DisplayFor(modelItem => item.DisplayName)
+		</td>
+
+		<td>
+			<a class="btn btn-link btn-warning" href="/teams/edit/@item.Id">Edit</a>
+			<button class="btn btn-link btn-danger" data-team-id="@item.Id">Delete</button>
+		</td>
+	</tr>
 	}
 	</table>
 
@@ -52,7 +53,7 @@
 					success: function () {
 						$this.parent().parent('tr').remove();
 					},
-					failure: function (a, b, c, d) {
+					error: function (a, b, c, d) {
 						alert('delete failed');
 						console.log(a, b, c);
 					}

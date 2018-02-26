@@ -7,13 +7,13 @@ namespace March_Madness.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.2.0-61023")]
-    public sealed partial class CreatedTeamModel : IMigrationMetadata
+    public sealed partial class ChangingTournamentTeamkeyinTournamentGamePicktoPickedTeam : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(CreatedTeamModel));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(ChangingTournamentTeamkeyinTournamentGamePicktoPickedTeam));
         
         string IMigrationMetadata.Id
         {
-            get { return "201802200006270_Created Team Model"; }
+            get { return "201802252019265_Changing TournamentTeam key in TournamentGamePick to PickedTeam"; }
         }
         
         string IMigrationMetadata.Source

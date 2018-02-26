@@ -23,7 +23,7 @@ namespace March_Madness.Helpers
 			return Enum.GetNames(typeof(Regions)).ToList();
 		}
 
-		public IQueryable<TeamModels> GetAllTeams()
+		public IQueryable<Teams> GetAllTeams()
 		{
 			return _context.Teams.OrderBy(t => t.Name);
 		}

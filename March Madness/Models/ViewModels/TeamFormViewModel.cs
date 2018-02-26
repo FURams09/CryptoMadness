@@ -15,13 +15,12 @@ namespace March_Madness.Models.ViewModels
 		public int Id { get; set; }
 
 		[Required]
-		[MaxLength(60)]
+		[MaxLength(150)]
 		public string Name { get; set; }
 
-		[Required]
-		[MaxLength(60)]
-		public string Mascot { get; set; }
+		[MaxLength(30)]
+		public string DisplayName { get; set; }
 
-		public List<TeamModels> AllTeams { get; set; }
+		public List<Teams> AllTeams { get; set; }
 	}
 }

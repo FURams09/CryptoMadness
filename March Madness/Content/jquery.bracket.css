@@ -93,7 +93,8 @@ div.jQBracket {
     div.jQBracket .team.win div.score {
       color: #060; }
     div.jQBracket .team.lose div.score {
-      color: #900; }
+      color: #900;
+      text-decoration: line-through; }
     div.jQBracket .team.lose {
       background-color: #ddd;
       color: #999; }

@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using Microsoft.AspNet.Identity;
 using March_Madness.Models;
+using March_Madness.Models.ViewModels;
 using March_Madness.Helpers;
+
 namespace March_Madness.Controllers
 {
     public class BracketController : Controller
@@ -15,11 +18,12 @@ namespace March_Madness.Controllers
 		{
 			_context = new ApplicationDbContext();
 		}
-        // GET: Bracket
-        public ActionResult Index()
-        {
+		// GET: Bracket
+		public ActionResult Index()
+		{
 			var utl = new Utility();
 			var bracket = utl.GetBracket();
+			var userID = User.Identity.GetUserId();
 
 			var round1Pos = Utility.Round1PairingOrder;
 
@@ -29,18 +33,27 @@ namespace March_Madness.Controllers
 			{
 				for (int i = 0; i < round1Pos.Count; i++)
 				{
-					TeamModels teamName = region.Value.First(t => t.Seed == round1Pos[i]).Team;
-					if ( i % 2 == 0)
+					Teams teamName = region.Value.First(t => t.Seed == round1Pos[i]).Team;
+					if (i % 2 == 0)
 					{
-						jQueryBracket.Add(new List<string>() { teamName.Name + ' ' + teamName.Mascot});
+						jQueryBracket.Add(new List<string>() { teamName.Name });
 					}
 					else
 					{
-						jQueryBracket[jQueryBracket.Count - 1].Add(teamName.Name + ' ' + teamName.Mascot);
+						jQueryBracket[jQueryBracket.Count - 1].Add(teamName.Name);
 					}
 				}
 			}
-            return View("BracketForm", jQueryBracket);
+
+			var userBracket = _context.TournamentEntry.Where(t => t.UserId == userID);
+
+			UserBracketViewModel userBracketView = new UserBracketViewModel()
+			{
+				UserBrackets = userBracket.ToList(),
+				TournamentTeams = jQueryBracket
+
+			};
+            return View("BracketForm", userBracketView);
         }
     }
 }

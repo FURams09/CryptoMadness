@@ -26,30 +26,33 @@ namespace March_Madness.Controllers
             var regions = Utility.GetRegionNames();
 
 
-            var seedOrder = _context.TournamentTeam
+            var seededOrder = _context.TournamentTeam
                 .OrderBy(t => t.Seed);
-            var east = seedOrder
+            var east = seededOrder
             .Where(t => t.Region == Regions.East)
-            .Select(t => t.TeamId );
+            .Select(t => new { t.Seed, t.TeamId } );
 
-            var midwest = seedOrder
+            var midwest = seededOrder
             .Where(t => t.Region == Regions.Midwest)
-            .Select(t =>t.TeamId );
+			.Select(t => new { t.Seed, t.TeamId });
 
-            var west = seedOrder
+			var west = seededOrder
             .Where(t => t.Region == Regions.West)
-            .Select(t => t.TeamId );
+			.Select(t => new { t.Seed, t.TeamId });
 
-            var south = seedOrder
+			var south = seededOrder
             .Where(t => t.Region == Regions.South)
-            .Select(t =>  t.TeamId );
+			.Select(t => new { t.Seed, t.TeamId });
 
-            TournamentRegionViewModel tournamentRegionViewModel = new TournamentRegionViewModel()
+			var bracket = new Dictionary<string, Dictionary<int, int>>();
+			bracket.Add("east", east.ToDictionary(t => t.Seed, t => t.TeamId));
+			bracket.Add("midwest", midwest.ToDictionary(t => t.Seed, t => t.TeamId));
+			bracket.Add("west", west.ToDictionary(t => t.Seed, t => t.TeamId));
+			bracket.Add("south", south.ToDictionary(t => t.Seed, t => t.TeamId));
+			
+			TournamentRegionViewModel tournamentRegionViewModel = new TournamentRegionViewModel()
             {
-                East = east.ToList(),
-                Midwest = midwest.ToList(),
-                West = west.ToList(),
-                South = south.ToList(),
+				Bracket = bracket,
 				Round1PairingOrder = Utility.Round1PairingOrder,
                 Teams = teamList.ToList()
             };

@@ -50,8 +50,7 @@ namespace March_Madness.Controllers
 			var teamFormViewModel = new TeamFormViewModel()
 			{
 				Id = team.Id,
-				Name = team.Name,
-				Mascot = team.Mascot
+				Name = team.Name
 			};
 			return View("TeamForm", teamFormViewModel);
         }
@@ -59,7 +58,7 @@ namespace March_Madness.Controllers
         // POST: Team/Edit/5
 		[ValidateAntiForgeryToken]
         [HttpPost]
-        public ActionResult Save(TeamModels teamModel)
+        public ActionResult Save(Teams teamModel)
         {
 			var allTeams = _utility.GetAllTeams();
 			TeamFormViewModel tfViewModel;
@@ -85,7 +84,7 @@ namespace March_Madness.Controllers
 						var team = _context.Teams.SingleOrDefault(t => t.Id == teamModel.Id);
 
 						team.Name = teamModel.Name;
-						team.Mascot = teamModel.Mascot;
+
 					}
 
 				}
@@ -96,7 +95,6 @@ namespace March_Madness.Controllers
 					{
 						Id = teamModel.Id,
 						Name = teamModel.Name,
-						Mascot = teamModel.Mascot,
 						AllTeams = allTeams.ToList()
 					};
 					return View("TeamForm", tfViewModel);
@@ -110,7 +108,6 @@ namespace March_Madness.Controllers
 					{
 						Id = 0,
 						Name = "",
-						Mascot = "",
 						AllTeams = allTeams.ToList()
 					};
 					return View("TeamForm", tfViewModel);
@@ -127,7 +124,6 @@ namespace March_Madness.Controllers
 				{
 					Id = teamModel.Id,
 					Name = teamModel.Name,
-					Mascot = teamModel.Mascot,
 					AllTeams = allTeams.ToList()
 				});
             }

@@ -7,17 +7,18 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace March_Madness.Models
 {
-	public class TeamModels
+	public class Teams
 	{
 		public int Id { get; set; }
 
 		[Required]
-		[MaxLength(60)]
+		[MaxLength(150)]
 		[Index(IsUnique = true)]
 		public string Name { get; set; }
 
-		[Required]
-		[MaxLength(60)]
-		public string Mascot { get; set; }
+		[MaxLength(30)]
+		[Display (Name="Display Name")]
+		public string DisplayName { get; set; }
 	}
+
 }

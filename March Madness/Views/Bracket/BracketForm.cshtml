@@ -1,13 +1,20 @@
-﻿@model List<List<string>>
+﻿@model March_Madness.Models.ViewModels.UserBracketViewModel
 @{
 	ViewBag.Title = "BracketForm";
 }
 
 <h2>Bracket Form</h2>
 <div class="row">
-	<div 
+	<select id="tournament-Selector">
+		@foreach (var bracket in Model.UserBrackets)
+		{
+			<option value="@bracket.Id">@bracket.Name</option>
+		}
+
+	</select>
 </div>
 <div class="row">
+	<input id="bracket-name" value="@Model.TournamentEntryName"/>
 	<div class="col-md-11">
 		<div id="crypto-madness" style="height: 260px;"></div>
 		
@@ -31,13 +38,18 @@
 
 		$(function () {
 			var teamArray = []
-			@foreach (var game in Model)
+			@foreach (var game in Model.TournamentTeams)
 			{
-				 @Html.Raw(($"teamArray.push([['{ game[0] }'], ['{ game[1]}']]);") + Environment.NewLine);
+				 @Html.Raw($"teamArray.push([[\"{ game[0] }\"], [\"{ game[1]}\"]]);" + Environment.NewLine);
 			}
+
+
+			/*randomly picked bracket put into string, then converted back */
+			var resultsString = @("[[[1,0],[1,0],[0,1],[1,0],[0,1],[0,1],[1,0],[1,0],[0,1],[1,0],[1,0],[1,0],[1,0],[1,0],[0,1],[1,0],[1,0],[1,0],[1,0],[0,1],[0,1],[1,0],[0,1],[1,0],[0,1],[1,0],[0,1],[1,0],[1,0],[1,0],[0,1],[1,0]],[[0,1],[0,1],[0,1],[0,1],[0,1],[0,1],[0,1],[0,1],[0,1],[1,0],[1,0],[0,1],[1,0],[0,1],[0,1],[0,1]],[[1,0],[1,0],[1,0],[1,0],[0,1],[0,1],[1,0],[0,1]],[[0,1],[0,1],[0,1],[0,1]],[[1,0],[0,1]],[[0,1]]]");
+
 			var minimalData = {
 				teams: teamArray,
-				results: [] /* second round */
+				results: resultsString /* second round */
 				
 			}
 			$('#crypto-madness')
@@ -54,56 +66,34 @@
 
 
 			$('#submitBracket').on('click', function () {
-				if ($('.highlightWinner').length > 0 && $('.highlightWinner .highlight').length === 0) {
+				//***REMOVE TRUE BEFORE GOING LIVE PL
+				if (true || $('.highlightWinner').length > 0 && $('.highlightWinner .highlight').length === 0) {
 					var results = $('#crypto-madness').bracket('data').results;
+
+					var entry = {
+						UserBrackets: null,
+						TournamentEntryName: $('#bracket-name').val(),
+						BracketPicks: results[0],
+						TournamentTeams: null
+					}
+
+					$.ajax({
+						url: '/api/bracket/save',
+						method: 'POST',
+						data: entry,
+						success: function () {
+							alert('successfully added bracket');
+						},
+						failure: function (a, b, c, d) {
+							alert('failed');
+							console.log(a, b, c, d);
+						}
+					})
 				} else {
 					alert('All games must be selected.');
 				}
 			});
-			//$('#crypto-madness-midwest')
-			//    .bracket({
-			//        init: minimalData, /* data to initialize the bracket with */
-			//        skipConsolationRound: true,
-			//        save: function () {
-			//            console.log('saved');
-			//        },
-			//        disableToolbar: true,
-			//        disableTeamEdit: true
-			//    })
-
-			//$('#crypto-madness-west')
-			//    .bracket({
-			//        init: minimalData, /* data to initialize the bracket with */
-			//        skipConsolationRound: true,
-			//        dir: 'rl',
-			//        save: function () {
-			//            console.log('saved');
-			//        },
-			//        disableToolbar: true,
-			//        disableTeamEdit: true
-			//    })
-
-			//$('#crypto-madness-south')
-			//    .bracket({
-			//        init: minimalData, /* data to initialize the bracket with */
-			//        skipConsolationRound: true,
-			//        dir: 'rl',
-			//        save: function() {
-			//            console.log('saved');
-			//        },
-			//        disableToolbar: true,
-			//        disableTeamEdit: true
-			//    });
-
-			//$('#crypto-madness-semi')
-			//    .bracket({
-			//        init: semiFinal, /* data to initialize the bracket with */
-			//		skipConsolationRound: true,
-			//		save: bracketSave //,
-			//		//disableToolbar: true,
-			//		//disableTeamEdit: true,
-			//    })
-
+			
 		})
 	</script>
 

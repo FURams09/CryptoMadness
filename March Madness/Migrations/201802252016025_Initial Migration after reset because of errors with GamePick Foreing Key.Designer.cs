@@ -7,13 +7,13 @@ namespace March_Madness.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.2.0-61023")]
-    public sealed partial class TeamNameMadeUnique : IMigrationMetadata
+    public sealed partial class InitialMigrationafterresetbecauseoferrorswithGamePickForeingKey : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(TeamNameMadeUnique));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(InitialMigrationafterresetbecauseoferrorswithGamePickForeingKey));
         
         string IMigrationMetadata.Id
         {
-            get { return "201802200240299_Team Name Made Unique"; }
+            get { return "201802252016025_Initial Migration after reset because of errors with GamePick Foreing Key"; }
         }
         
         string IMigrationMetadata.Source

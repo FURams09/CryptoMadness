@@ -21,10 +21,10 @@
 	</div>
 
 	<div class="form-group">
-		@Html.LabelFor(m => m.Mascot, htmlAttributes: new { @class = "control-label col-md-2" })
+		@Html.LabelFor(m => m.DisplayName, htmlAttributes: new { @class = "control-label col-md-2" })
 		<div class="col-md-10">
-			@Html.EditorFor(m => m.Mascot, new { htmlAttributes = new { @class = "form-control" } })
-			@Html.ValidationMessageFor(model => model.Mascot, "", new { @class = "text-danger" })
+			@Html.EditorFor(m => m.DisplayName, new { htmlAttributes = new { @class = "form-control" } })
+			@Html.ValidationMessageFor(model => model.DisplayName, "", new { @class = "text-danger" })
 		</div>
 	</div>
 	@Html.HiddenFor(m => m.Id)
@@ -38,13 +38,14 @@
 
 @if (Model.AllTeams != null)
 {
+	<button class="btn btn-primary" id="refresh-teams">Refresh Teams</button>
 	<div class="container">
-		<label>@Model.AllTeams.Count() Teams Entered</label>
+		<label id="team-count">@Model.AllTeams.Count() Teams Entered</label>
 		<br />
 		<select multiple id="team-list">
 			@foreach (var team in Model.AllTeams)
 			{
-				<option>@team.Name @team.Mascot</option>
+				<option>@team.Name</option>
 			}
 		</select>
 	</div>
@@ -55,3 +56,37 @@
 <div>
     @Html.ActionLink("Back to List", "Index")
 </div>
+
+@section scripts
+{
+	<script type="text/javascript">
+		$(function () {
+			$('#refresh-teams').on('click', function () {
+				var refreshingText = 'Refreshing';
+				var standardText = 'Refresh Teams';
+				var $this = $(this);
+				$this.attr('disabled', true);
+				$this.text(refreshingText);
+				$.ajax({
+					url: "/api/teams/refresh",
+					method: "POST",
+					success: function (d) {
+						$this.attr('disabled', true);
+						var teamList = $('#team-list')
+						teamList.empty();
+						$.each(d, function (index, team) {
+							teamList.append($("<option>" + team.name + "</option>"))
+						})
+						$this.attr('disabled', false);
+						$this.text(standardText);
+						$('#team-count').text(d.length + ' Teams Entered');
+					},
+					error: function () {
+						$this.attr('disabled', false);
+						$this.text (standardText);
+					}
+				})
+			});
+		})
+	</script>
+	}

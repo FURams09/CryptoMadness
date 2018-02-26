@@ -2,13 +2,25 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.ComponentModel.DataAnnotations;
 
 namespace March_Madness.Models
 {
 	public class TournamentGamePick
 	{
 		public int Id { get; set; }
-		public	int	GameId { get; set; }
-		public int Winner { get; set; }
+
+		public int TournamentEntryID { get; set; }
+
+		public int RoundNo { get; set; }
+
+		public	int	GameNo { get; set; }
+
+		[Display (Name = "Winner")]
+		public int PickedTeamId { get; set; }
+
+		public TournamentTeams PickedTeam { get; set; }
+
+
 	}
 }

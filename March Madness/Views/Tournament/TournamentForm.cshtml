@@ -1,4 +1,4 @@
-﻿@model March_Madness.Models.ViewModels.TournamentRegionViewModel
+﻿
 @{
     ViewBag.Title = "TournamentForm";
 }
@@ -20,88 +20,107 @@
 			<h2 id="south-header">South</h2>
 		</div>
 	</div>
-	<button id="save" class="btn btn-primary btn-success">Save</button>
+
+	<div id="loading">
+		<h4 id="loading-text">Loading</h4>
+		<div class="progress">
+			<div id="loading-bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+		</div>
+	</div>
+	
+	<button id="save" class="btn btn-primary btn-success" style="display: none;">Save</button>
 </div>
 @section scripts
 {
 <script type="text/javascript">
 	var isDev = true;
-	var bracket = {
-		'East': @("["  + String.Join(",", Model.East) + "]"),
-		'Midwest': @("["  + String.Join(",", Model.Midwest) + "]"),
-		'West': @("["  + String.Join(",", Model.West) + "]"),
-		'South': @("["  + String.Join(",", Model.South) + "]")
-	};
-
-	var seedOrder = @("["  + String.Join(",", Model.Round1PairingOrder) + "]")
 
 	$(function () {
 		$.ajax({
-			url: '/api/teams',
+			url: '/api/tournament',
 			method: 'GET',
 			success: function (d) {
 				var masterSelect = $('<select>').css('float', 'right');
-				$.each(d,
+				$.each(d.teams,
 					function(i, school) {
 						masterSelect.append('<option value=' +
 							school.id +
 							'>' +
-							school.name +
-							' ' +
-							school.mascot +
+							(school.displayName ? school.displayName : school.name) +
 							'</option>');
 					});
-
-				$.each(bracket, function (region, teams) {
+				
+				$.each(d.bracket, function (region, teams) {
 					var regionDiv;
-					$.each(seedOrder, function (index, seed) {
+					$.each(d.round1PairingOrder, function (index, seed) {
 						var newSelect = $('<div>');
+						var teamId = teams[seed] || 0;
+
+						//add padding between games
 						if (index % 2 == 1) {
 							newSelect.css('margin-bottom', '10px');
 						}
 						newSelect.append($('<label>').addClass('badge badge-light').css('width', '20px').text(seed));
-						newSelect.append(masterSelect.clone().val(teams[seed - 1]).data('seed', seed).data('region', region));
-								
+						newSelect.append(masterSelect.clone().val(teamId).data('seed', seed).data('region', region));
+
 						$('#' + region.toLowerCase() + '-col').append(newSelect);
 					})
-				})
+				});
+
+				$('#loading').hide();
+				$('#save').show();
+				
 			},
-			failure: function(a, b, c) {
+			error: function(a, b, c) {
 				console.log(a, b, c);
+				$('#loading-text').text('An Error Has Occured');
+				var loadingBar = $('#loading-bar');
+				loadingBar.removeClass('progress-bar-animated').addClass('bg-danger');
+
 			}
 		});
 
 		$('#save')
 			.on('click',
-				function() {
-					$('select').each(
-						function () {
-							var $this = $(this);
-							if ($this.val() === 0) {
-								if (!isDev) {
-									alert('Please fill in all 64 Seeds');
-									return false;
-								}
+			function () {
+				var bracket = {
+					east: {},
+					midwest: {},
+					west: {},
+					south: {}
+				}
+
+				$('select').each(
+					function () {
+						var $this = $(this);
+						if (!$this.val() || $this.val() === 0) {
+							if (!isDev) {
+								alert('Please fill in all 64 Seeds');
+								return false;
 							}
-							else {
-								bracket[$this.data('region')][$this.data('seed') - 1] = $this.val();
-							}
+						}
+						else {
+							bracket[$this.data('region')][$this.data('seed')] = $this.val();
+						}
 									
-						});
+					});
 
-						$.ajax({
-							url: '/api/Tournament',
-							method: 'POST',
-							data: bracket,
-							success: function() {
-								alert('Tournament Updated');
-							},
-							failure: function() {
+				$.ajax({
+					url: '/api/Tournament',
+					method: 'POST',
+					data: JSON.stringify(bracket),
+					contentType: 'application/json',
+					success: function () {
+						alert('Tournament Updated');
+					},
+					error: function () {
 
-							}
-						})
-
+					}
 				});
+
+			});
+
+		
 	});
 </script>
 }
