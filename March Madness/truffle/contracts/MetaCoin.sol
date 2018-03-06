@@ -9,19 +9,39 @@ import "./ConvertLib.sol";
 
 contract MetaCoin {
 	mapping (address => uint) balances;
-
+	uint public costPerMetaCoin = 100;
 	event Transfer(address indexed _from, address indexed _to, uint256 _value);
-
-	function MetaCoin() public {
-		balances[tx.origin] = 10000;
+	address owner;
+	modifier onlyOwner() {
+		require(msg.sender == owner);
+		_;
 	}
 
+	function MetaCoin() public {
+		balances[msg.sender] = 10000;
+		owner == msg.sender;
+	}
+
+	function setRate(uint costPerCoin) public onlyOwner {
+		costPerMetaCoin = costPerCoin;
+	}
+
+	function createCoin(address receiver, uint amt) public onlyOwner {
+		balances[receiver] += amt;
+	}
 	function sendCoin(address receiver, uint amount) public returns(bool sufficient) {
 		if (balances[msg.sender] < amount) return false;
 		balances[msg.sender] -= amount;
 		balances[receiver] += amount;
 		Transfer(msg.sender, receiver, amount);
 		return true;
+	}
+
+	function buyCoin() public payable returns(uint newBalance, uint coinsBought ) {
+		coinsBought = (msg.value / 1 ether) * costPerMetaCoin;
+		//balances[msg.sender] += coinsBought;
+
+		newBalance =  balances[msg.sender];
 	}
 
 	function getBalanceInEth(address addr) public view returns(uint){

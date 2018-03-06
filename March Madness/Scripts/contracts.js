@@ -28,33 +28,75 @@ App = {
 
 	  // Set the provider for our contract
 	  App.contracts.MetaCoin.setProvider(App.web3Provider);
-	  App.sendCoin(3, 8);
 	});
    	
   },
-  sendCoin: function(receiverIndex, amt) {
-   var metaCoinInstance;
+  sendCoin: function(senderIndex, receiverIndex, amt) {
+	    var metaCoinInstance;
 
-	App.contracts.MetaCoin.deployed()
-	.then(function(instance) {
-	  metaCoinInstance = instance;
-	  metaCoinInstance.sendCoin(web3.eth.accounts[3], amt, {from: web3.eth.accounts[2]})
-	  return metaCoinInstance.getBalance.call(web3.eth.accounts[receiverIndex]);
+		App.contracts.MetaCoin.deployed()
+		.then(function(instance) {
+		  metaCoinInstance = instance;
+		  metaCoinInstance.sendCoin(web3.eth.accounts[receiverIndex], amt, {from: web3.eth.accounts[senderIndex]})
 		})
-	.then(function(metaCoin) {
-		console.log(metaCoin.toNumber());
-		return metaCoinInstance.getBalance.call(web3.eth.accounts[2]);	
-	})
-	.then(function(senderAccount) {
-		console.log(senderAccount.toNumber());
-	})
-	.catch(function(err) {
-		  console.log(err.message);
-	});
-  }
+		.then(function(results) {
+		  return metaCoinInstance.getBalance.call(web3.eth.accounts[receiverIndex]);
+		})
+		.then(function(metaCoin) {
+			console.log(metaCoin.toNumber());
+			return metaCoinInstance.getBalance.call(web3.eth.accounts[senderIndex]);	
+		})
+		.then(function(senderAccount) {
+			console.log(senderAccount.toNumber());
+		})
+		.catch(function(err) {
+			  console.log(err.message);
+		});
+	},
+	getBalance: function(accountIndex) {
+		var coinInstance;
+		App.contracts.MetaCoin.deployed()
+		.then(function(instance) {
+			coinInstance = instance;
+			return coinInstance.getBalance(web3.eth.accounts[accountIndex])
+		})
+		.then(function(balance) {
+			console.log(balance.toNumber());
+		})
+		.catch(function(err) {
+			console.log(err)
+		});
+	},
+	buyCoins: function(buyerIndex, amt) {
+		var coinInstance;
+		App.contracts.MetaCoin.deployed()
+		.then(function(instance) {
+			coinInstance = instance;
+			coinInstance.buyCoin({from: web3.eth.accounts[buyerIndex], value: web3.toWei(amt, "ether")})
+		})
+		.then(function(buyResults) {
+			console.log(buyResults);
+		})
+		.catch(function(err) {
+			console.log(err)
+		});
 
-};
-
+	},
+	createCoins: function(recipient, amt) {
+		var coinInstance;
+		App.contracts.MetaCoin.deployed()
+		.then(function(instance) {
+			coinInstance = instance;
+			return coinInstance.createCoin(web3.eth.accounts[recipient], web3.toWei(amt, "ether"));
+		})
+		.then(function(deositResults) {
+			console.log(buyResults);
+		})
+		.catch(function(err) {
+			console.log(err)
+		});
+	}
+}
 $(function() {
 
     App.init();
