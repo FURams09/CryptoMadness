@@ -24,10 +24,16 @@ namespace March_Madness
 			bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include(
 					  "~/Scripts/bootstrap.js",
 					  "~/Scripts/respond.js"));
+		    bundles.Add(new ScriptBundle("~/bundles/truffle-contracts").Include(
+                "~/bower_components/web3/dist/web3.min.js",
+                "~/node_modules/truffle-contract/dist/truffle-contract.js",
+                "~/Scripts/contracts.js"
+                ));
 
 			bundles.Add(new StyleBundle("~/Content/css").Include(
 					  "~/Content/bootstrap-cyborg.css",
 					  "~/Content/site.css"));
+                   
 		}
 	}
 }
