@@ -29,15 +29,17 @@ namespace March_Madness.Helpers
 		}
 
 		
-		public Dictionary<Regions, List<TournamentTeams>> GetBracket() { 
+		public Dictionary<Regions, List<TournamentTeams>> GetTournamentBracket() { 
 
 			List<TournamentTeams> regionTeams = new List<TournamentTeams>() {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null };
 
-			Dictionary<Regions, List<TournamentTeams>> bracket = new Dictionary<Regions, List<TournamentTeams>>();
-			bracket.Add(Regions.East, new List<TournamentTeams>(regionTeams));
-			bracket.Add(Regions.Midwest, new List<TournamentTeams>(regionTeams));
-			bracket.Add(Regions.West, new List<TournamentTeams>(regionTeams));
-			bracket.Add(Regions.South, new List<TournamentTeams>(regionTeams));
+			Dictionary<Regions, List<TournamentTeams>> bracket = new Dictionary<Regions, List<TournamentTeams>>
+			{
+				{ Regions.East, new List<TournamentTeams>(regionTeams) },
+				{ Regions.Midwest, new List<TournamentTeams>(regionTeams) },
+				{ Regions.West, new List<TournamentTeams>(regionTeams) },
+				{ Regions.South, new List<TournamentTeams>(regionTeams) }
+			};
 
 			var tournamentTeams = _context.TournamentTeam.Include(t => t.Team)
 				.ToList();
@@ -45,10 +47,45 @@ namespace March_Madness.Helpers
 			foreach (TournamentTeams team in tournamentTeams)
 			{
 				bracket[team.Region][team.Seed - 1] = team;
-				
 			}
 
 			return bracket;	
 		}
-    }
+
+		public List<List<List<int>>> GetIndividualBracket(int bracketId)
+		{
+
+			var bracket = new List<List<List<int>>>();
+
+			for (int i = 0; i < 6; i++)
+			{
+				bracket.Add(new List<List<int>>());
+			}
+
+			var tournamentTeams = _context.TournamentGame
+				.Where(t => t.TournamentEntryID == bracketId)
+				.OrderBy(t => new { t.RoundNo, t.GameNo})
+				.Include(t => t.PickedTeam)
+				.ToList();
+
+			foreach (TournamentGamePick game in tournamentTeams)
+			{
+				var gameList = new List<int>() { 0, 0 };
+				switch (game.HomeOrAway)
+				{
+					case HomeOrAway.Home:
+						bracket[game.RoundNo].Add(new List<int>() { 1, 0 });
+						break;
+					case HomeOrAway.Away:
+						bracket[game.RoundNo].Add(new List<int>() { 0, 1 });
+						break;
+
+				}
+				
+			}
+
+			return bracket;
+		}
+
+	}
 }

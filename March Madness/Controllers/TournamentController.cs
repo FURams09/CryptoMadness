@@ -44,12 +44,14 @@ namespace March_Madness.Controllers
             .Where(t => t.Region == Regions.South)
 			.Select(t => new { t.Seed, t.TeamId });
 
-			var bracket = new Dictionary<string, Dictionary<int, int>>();
-			bracket.Add("east", east.ToDictionary(t => t.Seed, t => t.TeamId));
-			bracket.Add("midwest", midwest.ToDictionary(t => t.Seed, t => t.TeamId));
-			bracket.Add("west", west.ToDictionary(t => t.Seed, t => t.TeamId));
-			bracket.Add("south", south.ToDictionary(t => t.Seed, t => t.TeamId));
-			
+			var bracket = new Dictionary<string, Dictionary<int, int>>
+			{
+				{ "east", east.ToDictionary(t => t.Seed, t => t.TeamId) },
+				{ "midwest", midwest.ToDictionary(t => t.Seed, t => t.TeamId) },
+				{ "west", west.ToDictionary(t => t.Seed, t => t.TeamId) },
+				{ "south", south.ToDictionary(t => t.Seed, t => t.TeamId) }
+			};
+
 			TournamentRegionViewModel tournamentRegionViewModel = new TournamentRegionViewModel()
             {
 				Bracket = bracket,

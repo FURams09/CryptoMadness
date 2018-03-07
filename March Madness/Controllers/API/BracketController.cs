@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Data.Entity;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
@@ -23,27 +24,29 @@ namespace March_Madness.Controllers.API
 		[Route("api/bracket/save")]
 		[HttpPost]
 		//[Authorize]
-		public IHttpActionResult SaveTournament(UserBracketViewModel bracket)
+		public IHttpActionResult SaveBracket(UserBracketViewModel bracket)
 		{
 			try
 			{
 				TournamentEntry tournamentBracket;
 				string currentUserId = User.Identity.GetUserId();
 				bool isNewBracket = false;
-				tournamentBracket = _context.TournamentEntry.SingleOrDefault(t => t.Name == bracket.TournamentEntryName && t.UserId == currentUserId);
+
+				tournamentBracket = _context.TournamentEntry.Include(t => t.Picks).SingleOrDefault(t => t.Id == bracket.TournamentId);
 				if (tournamentBracket == null )
 				{
+					var bracketName = bracket.TournamentEntryName is null ? User.Identity.Name + ' ' + DateTime.Now.ToShortDateString() : bracket.TournamentEntryName;
 					tournamentBracket = new TournamentEntry()
 					{
 						UserId = currentUserId,
-						Name = bracket.TournamentEntryName,
+						Name = bracketName,
 						Picks = new List<TournamentGamePick>()
 					};
 					isNewBracket = true;
 				} 
 
 				var utl = new Utility();
-				var teamList = utl.GetBracket();
+				var teamList = utl.GetTournamentBracket();
 
 				List<TournamentTeams> currentPicks = new List<TournamentTeams>() ;
 
@@ -69,6 +72,7 @@ namespace March_Madness.Controllers.API
 						else
 						{
 							TournamentTeams team1, team2, winner;
+							HomeOrAway winnerHomeAway;
 							if (i == 0)
 							{
 								var region = j / 8;
@@ -110,40 +114,64 @@ namespace March_Madness.Controllers.API
 							if (game[1] == 1)
 							{
 								winner = team2;
+								winnerHomeAway = HomeOrAway.Away;
+								
 							}
 							else
 							{
 								winner = team1;
+								winnerHomeAway = HomeOrAway.Home;
 							}
-							var pick = new TournamentGamePick()
-							{
-								RoundNo = i,
-								GameNo = j,
-								PickedTeamId = winner.Id,
-
-							};
+							
 							currentPicks.Add(winner);
+
+							TournamentGamePick pick;
 							if (isNewBracket)
 							{
+								pick = new TournamentGamePick()
+								{
+									RoundNo = i,
+									GameNo = j,
+									PickedTeamId = winner.Id,
+									HomeOrAway = winnerHomeAway 
+
+								};
 								tournamentBracket.Picks.Add(pick);
 							}
 							else
 							{
-								var currentPick = tournamentBracket.Picks.SingleOrDefault(t => t.RoundNo == i & t.GameNo == j);
+								var currentPick = tournamentBracket.Picks.Single(t => t.RoundNo == i & t.GameNo == j);
 								if (currentPick == null)
 								{
+									pick = new TournamentGamePick()
+									{
+										RoundNo = i,
+										GameNo = j,
+										PickedTeamId = winner.Id,
+										HomeOrAway = winnerHomeAway
+
+									};
+
 									tournamentBracket.Picks.Add(pick);
 								}
 								else
 								{
-									currentPick.PickedTeamId = winner.Id;
+									if (currentPick.PickedTeamId != winner.Id) {
+										currentPick.PickedTeamId = winner.Id;
+										currentPick.HomeOrAway = winnerHomeAway;
+									}
+									
 								}
 							}
 							
 						}
 					}
 				}
-				_context.TournamentEntry.Add(tournamentBracket);
+				if (isNewBracket)
+				{
+					_context.TournamentEntry.Add(tournamentBracket);
+				}
+				
 				if (ModelState.IsValid)
 				{
 					_context.SaveChanges();
@@ -159,5 +187,17 @@ namespace March_Madness.Controllers.API
 			}
 			return Ok();
 		}
+
+		[Route("api/bracket/{bracketId}")]
+		[HttpGet]
+		//[Authorize]
+		public IHttpActionResult GetBracket(int bracketId)
+		{
+			var utl = new Utility();
+
+			return Ok(utl.GetIndividualBracket(bracketId).ToArray());
+		}
 	}
+
+
 }

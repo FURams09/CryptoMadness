@@ -22,7 +22,7 @@ namespace March_Madness.Controllers
 		public ActionResult Index()
 		{
 			var utl = new Utility();
-			var bracket = utl.GetBracket();
+			var bracket = utl.GetTournamentBracket();
 			var userID = User.Identity.GetUserId();
 
 			var round1Pos = Utility.Round1PairingOrder;

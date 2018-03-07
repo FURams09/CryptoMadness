@@ -5,10 +5,11 @@
 
 <h2>Bracket Form</h2>
 <div class="row">
-	<select id="tournament-Selector">
+	<select id="bracket-selector">
+		<option value=0>New Bracket</option>
 		@foreach (var bracket in Model.UserBrackets)
 		{
-			<option value="@bracket.Id">@bracket.Name</option>
+			<option value=@bracket.Id>@bracket.Name</option>
 		}
 
 	</select>
@@ -35,9 +36,14 @@
 
 
 
-
+		var teamArray = [];
+		var bracketStore = {
+			isNewBracketShown: true,
+			newBracketNamet: '',
+			newBracketData: []
+		};
 		$(function () {
-			var teamArray = []
+			
 			@foreach (var game in Model.TournamentTeams)
 			{
 				 @Html.Raw($"teamArray.push([[\"{ game[0] }\"], [\"{ game[1]}\"]]);" + Environment.NewLine);
@@ -45,24 +51,9 @@
 
 
 			/*randomly picked bracket put into string, then converted back */
-			var resultsString = @("[[[1,0],[1,0],[0,1],[1,0],[0,1],[0,1],[1,0],[1,0],[0,1],[1,0],[1,0],[1,0],[1,0],[1,0],[0,1],[1,0],[1,0],[1,0],[1,0],[0,1],[0,1],[1,0],[0,1],[1,0],[0,1],[1,0],[0,1],[1,0],[1,0],[1,0],[0,1],[1,0]],[[0,1],[0,1],[0,1],[0,1],[0,1],[0,1],[0,1],[0,1],[0,1],[1,0],[1,0],[0,1],[1,0],[0,1],[0,1],[0,1]],[[1,0],[1,0],[1,0],[1,0],[0,1],[0,1],[1,0],[0,1]],[[0,1],[0,1],[0,1],[0,1]],[[1,0],[0,1]],[[0,1]]]");
 
-			var minimalData = {
-				teams: teamArray,
-				results: resultsString /* second round */
-				
-			}
-			$('#crypto-madness')
-				.bracket({
-					init: minimalData, /* data to initialize the bracket with */
-					skipConsolationRound: true,
-					save: bracketSave,
-					disableToolbar: true,
-					disableTeamEdit: true,
-					teamWidth: 150,
-					scoreWidth: 0,
-					showFinalBubble: false
-				});
+
+			getTournamentBracket()
 
 
 			$('#submitBracket').on('click', function () {
@@ -72,6 +63,7 @@
 
 					var entry = {
 						UserBrackets: null,
+						TournamentId: $('#bracket-selector').val(),
 						TournamentEntryName: $('#bracket-name').val(),
 						BracketPicks: results[0],
 						TournamentTeams: null
@@ -93,8 +85,61 @@
 					alert('All games must be selected.');
 				}
 			});
-			
+
+			$('#bracket-selector').on('change', function () {
+				getTournamentBracket();
+				if (bracketSave.isNewBracketShown) {
+					//store what state the bracket currently is in
+				} else if ($(this).val() == 0) {
+					//repopulate with last new bracket state. 
+				}
+				$('#bracket-name').val('');
+			})
+
 		})
+
+		function getTournamentBracket() {
+			var bracketId = $('#bracket-selector').val();
+			if (bracketId == 0) {
+				fillBracket();
+				 
+			} else {
+				$.ajax({
+					url: '/api/bracket/' + bracketId,
+					method: 'GET',
+					success: function (res) {
+						var initData = {
+							teams: teamArray,
+							results: res /* second round */
+						}
+
+						fillBracket(initData)
+					},
+					failure: function (a, b, c) {
+						console.log(a, b, c);
+					}
+				});
+			}
+			
+		}
+
+		function fillBracket(data) {
+			data = data || {
+				teams: teamArray,
+				results: []
+			}
+			$('#crypto-madness')
+				.bracket({
+					init: data, /* data to initialize the bracket with */
+					skipConsolationRound: true,
+					save: bracketSave,
+					disableToolbar: true,
+					disableTeamEdit: true,
+					teamWidth: 150,
+					scoreWidth: 0,
+					showFinalBubble: false
+				});
+		}
 	</script>
 
 }

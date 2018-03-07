@@ -10,8 +10,12 @@ import "./ConvertLib.sol";
 contract MetaCoin {
 	mapping (address => uint) balances;
 	uint public costPerMetaCoin = 100;
-	event Transfer(address indexed _from, address indexed _to, uint256 _value);
 	address owner;
+
+	event Minted(address indexed _to, uint indexed _amount);
+	event Bought(address indexed _buyer, uint indexed _amountSent, uint indexed _amountMinted);
+	event Transfer(address indexed _from, address indexed _to, uint256 _value);
+	
 	modifier onlyOwner() {
 		require(msg.sender == owner);
 		_;
@@ -28,24 +32,36 @@ contract MetaCoin {
 
 	function createCoin(address receiver, uint amt) public onlyOwner {
 		balances[receiver] += amt;
+		Minted(receiver, amt);
 	}
 	function sendCoin(address receiver, uint amount) public returns(bool sufficient) {
-		if (balances[msg.sender] < amount) return false;
+		if (balances[msg.sender] < amount) {return false;}
 		balances[msg.sender] -= amount;
 		balances[receiver] += amount;
 		Transfer(msg.sender, receiver, amount);
 		return true;
 	}
 
-	function buyCoin() public payable returns(uint newBalance, uint coinsBought ) {
-		coinsBought = (msg.value / 1 ether) * costPerMetaCoin;
-		//balances[msg.sender] += coinsBought;
-
-		newBalance =  balances[msg.sender];
+	function() public payable {
+		uint boughtAmount = ConvertLib.convert(weiToEth(msg.value), costPerMetaCoin);
+		balances[msg.sender] += boughtAmount;
+		Bought(msg.sender, msg.value,  boughtAmount);
 	}
 
-	function getBalanceInEth(address addr) public view returns(uint){
-		return ConvertLib.convert(getBalance(addr),2);
+	function weiToEth(uint val) private pure returns (uint) {
+		return val / 1 ether;
+	}
+
+	function getContractValue() public view onlyOwner returns (uint) {
+		return this.balance;
+	}
+
+	function withdrawlEther(uint amt) public payable onlyOwner {
+		msg.sender.transfer(amt);
+	}
+
+	function getBalanceInEth(address addr) public view returns(uint) {
+		return ConvertLib.convert(getBalance(addr),costPerMetaCoin);
 	}
 
 	function getBalance(address addr) public view returns(uint) {

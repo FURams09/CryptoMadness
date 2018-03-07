@@ -16,6 +16,8 @@ namespace March_Madness.Models
 
 		public	int	GameNo { get; set; }
 
+		public HomeOrAway HomeOrAway { get; set; }
+
 		[Display (Name = "Winner")]
 		public int PickedTeamId { get; set; }
 

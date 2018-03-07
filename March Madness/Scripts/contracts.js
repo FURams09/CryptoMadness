@@ -72,7 +72,7 @@ App = {
 		App.contracts.MetaCoin.deployed()
 		.then(function(instance) {
 			coinInstance = instance;
-			coinInstance.buyCoin({from: web3.eth.accounts[buyerIndex], value: web3.toWei(amt, "ether")})
+			return coinInstance.sendTransaction({from: web3.eth.accounts[buyerIndex], value: web3.toWei(amt, "ether")})
 		})
 		.then(function(buyResults) {
 			console.log(buyResults);
@@ -87,7 +87,7 @@ App = {
 		App.contracts.MetaCoin.deployed()
 		.then(function(instance) {
 			coinInstance = instance;
-			return coinInstance.createCoin(web3.eth.accounts[recipient], web3.toWei(amt, "ether"));
+			return coinInstance.createCoin(web3.eth.accounts[recipient], amt);
 		})
 		.then(function(deositResults) {
 			console.log(buyResults);
@@ -95,7 +95,7 @@ App = {
 		.catch(function(err) {
 			console.log(err)
 		});
-	}
+	},
 }
 $(function() {
 

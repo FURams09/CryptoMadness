@@ -15,4 +15,12 @@ namespace March_Madness.Models
 		[Display(Name = "South")]
 		South = 4
 	}
+
+	public enum HomeOrAway
+	{
+		[Display(Name = "Home")]
+		Home = 0,
+		[Display(Name = "Away")]
+		Away = 1
+	}
 }

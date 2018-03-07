@@ -10,6 +10,8 @@ namespace March_Madness.Models.ViewModels
 
 		public List<TournamentEntry> UserBrackets { get; set; }
 
+		public int TournamentId { get; set; }
+
 		public string TournamentEntryName { get; set; }
 
 		public List<List<List<int>>> BracketPicks { get; set; }

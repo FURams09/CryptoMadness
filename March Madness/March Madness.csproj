@@ -333,6 +333,15 @@
     <Compile Include="Migrations\201802252044567_Got rid of Mascot and added Display Name.Designer.cs">
       <DependentUpon>201802252044567_Got rid of Mascot and added Display Name.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201803070244222_Adding Bracket Config Home\Away to pick team.cs" />
+    <Compile Include="Migrations\201803070245325_Adding Bracket Config Home_Away to pick team.cs" />
+    <Compile Include="Migrations\201803070245325_Adding Bracket Config Home_Away to pick team.Designer.cs">
+      <DependentUpon>201803070245325_Adding Bracket Config Home_Away to pick team.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803070307456_ChangingHomeOrAway to Enum.cs" />
+    <Compile Include="Migrations\201803070307456_ChangingHomeOrAway to Enum.Designer.cs">
+      <DependentUpon>201803070307456_ChangingHomeOrAway to Enum.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Enums\Enums.cs" />
     <Compile Include="Models\TournamentEntry.cs" />
@@ -1450,6 +1459,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201802252044567_Got rid of Mascot and added Display Name.resx">
       <DependentUpon>201802252044567_Got rid of Mascot and added Display Name.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803070245325_Adding Bracket Config Home_Away to pick team.resx">
+      <DependentUpon>201803070245325_Adding Bracket Config Home_Away to pick team.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803070307456_ChangingHomeOrAway to Enum.resx">
+      <DependentUpon>201803070307456_ChangingHomeOrAway to Enum.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
