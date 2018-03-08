@@ -1430,6 +1430,7 @@
     <Content Include="truffle\build\contracts\Migrations.json" />
     <Content Include="truffle\contracts\.placeholder" />
     <Content Include="truffle\test\.placeholder" />
+    <Content Include="Views\Bracket\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

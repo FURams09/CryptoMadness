@@ -9,7 +9,8 @@
 		<option value=0>New Bracket</option>
 		@foreach (var bracket in Model.UserBrackets)
 		{
-			<option value=@bracket.Id>@bracket.Name</option>
+
+			<option value=@bracket.Id @(bracket.Id == Model.TournamentId ? $"selected='selected'" : "")>@bracket.Name</option>
 		}
 
 	</select>
@@ -51,7 +52,7 @@
 
 
 			/*randomly picked bracket put into string, then converted back */
-
+			$('')
 
 			getTournamentBracket()
 

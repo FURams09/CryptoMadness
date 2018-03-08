@@ -19,7 +19,8 @@ namespace March_Madness.Controllers
 			_context = new ApplicationDbContext();
 		}
 		// GET: Bracket
-		public ActionResult Index()
+		[Route("bracket/bracketForm/{bracketID?}")]
+		public ActionResult BracketForm(int bracketID = 0)
 		{
 			var utl = new Utility();
 			var bracket = utl.GetTournamentBracket();
@@ -50,10 +51,19 @@ namespace March_Madness.Controllers
 			UserBracketViewModel userBracketView = new UserBracketViewModel()
 			{
 				UserBrackets = userBracket.ToList(),
-				TournamentTeams = jQueryBracket
+				TournamentTeams = jQueryBracket,
+				TournamentId = bracketID
 
 			};
             return View("BracketForm", userBracketView);
         }
+
+		public ViewResult Index()
+		{
+			string user = User.Identity.GetUserId();
+		    List<TournamentEntry> userEntries =	_context.TournamentEntry.Where(t => t.UserId == user).ToList();
+
+			return View("Index", userEntries);
+		}
     }
 }

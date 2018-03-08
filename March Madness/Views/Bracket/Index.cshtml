@@ -1,0 +1,30 @@
+﻿@model IEnumerable<March_Madness.Models.TournamentEntry>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("New", "BracketForm")
+</p>
+<table class="table md-col-3">
+	<tr>
+		<th>
+			@Html.DisplayNameFor(model => model.Name)
+		</th>
+		<th></th>
+	</tr>
+
+	@foreach (var item in Model)
+	{
+		<tr>
+			<td>
+				@Html.ActionLink(item.Name, "BracketForm", new { id = item.Id })
+			</td>
+
+		</tr>
+	}
+
+</table>
