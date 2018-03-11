@@ -3,15 +3,18 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security;
 
-namespace March_Madness.Models
+namespace March_Madness.Models.ViewModels
 {
-    public class IndexViewModel
-    {
-        public bool HasPassword { get; set; }
-        public IList<UserLoginInfo> Logins { get; set; }
-        public string PhoneNumber { get; set; }
-        public bool TwoFactor { get; set; }
-        public bool BrowserRemembered { get; set; }
+	public class IndexViewModel
+	{
+		public bool HasPassword { get; set; }
+		public IList<UserLoginInfo> Logins { get; set; }
+		public string PhoneNumber { get; set; }
+		public bool TwoFactor { get; set; }
+		public bool BrowserRemembered { get; set; }
+		public string UserName { get; set; }
+		public string MainAddress { get; set; }
+
     }
 
     public class ManageLoginsViewModel
@@ -83,4 +86,24 @@ namespace March_Madness.Models
         public string SelectedProvider { get; set; }
         public ICollection<System.Web.Mvc.SelectListItem> Providers { get; set; }
     }
+
+	public class UserViewModel
+	{
+
+		public string UserId { get; set; }
+
+		[Required]
+		public string UserName { get; set; }
+
+		[Required]
+		[MaxLength(42)]
+		public string MainAddress { get; set; }
+
+		[EmailAddress]
+		public string Email { get; set; }
+
+		[Phone]
+		public string PhoneNumber { get; set; }
+
+	}
 }

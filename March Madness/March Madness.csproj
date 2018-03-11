@@ -310,13 +310,16 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\API\BracketController.cs" />
+    <Compile Include="Controllers\API\PoolController.cs" />
     <Compile Include="Controllers\API\TeamsController.cs" />
     <Compile Include="Controllers\API\TournamentController.cs" />
     <Compile Include="Controllers\BracketController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
+    <Compile Include="Controllers\PoolController.cs" />
     <Compile Include="Controllers\TeamsController.cs" />
     <Compile Include="Controllers\TournamentController.cs" />
+    <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -342,16 +345,69 @@
     <Compile Include="Migrations\201803070307456_ChangingHomeOrAway to Enum.Designer.cs">
       <DependentUpon>201803070307456_ChangingHomeOrAway to Enum.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201803090307248_Naming Improvements and Adding Pool Model.cs" />
+    <Compile Include="Migrations\201803090307248_Naming Improvements and Adding Pool Model.Designer.cs">
+      <DependentUpon>201803090307248_Naming Improvements and Adding Pool Model.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803090320375_Creating Pools and PoolBrackets.cs" />
+    <Compile Include="Migrations\201803090320375_Creating Pools and PoolBrackets.Designer.cs">
+      <DependentUpon>201803090320375_Creating Pools and PoolBrackets.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803090331140_Adding Ref to Owner from BracketEntry.cs" />
+    <Compile Include="Migrations\201803090331140_Adding Ref to Owner from BracketEntry.Designer.cs">
+      <DependentUpon>201803090331140_Adding Ref to Owner from BracketEntry.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803100358481_Making BracketEntries belong to a single pool.cs" />
+    <Compile Include="Migrations\201803100358481_Making BracketEntries belong to a single pool.Designer.cs">
+      <DependentUpon>201803100358481_Making BracketEntries belong to a single pool.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803100419016_Drop old TournamentEntry Column in BrcketEntries.cs" />
+    <Compile Include="Migrations\201803100419016_Drop old TournamentEntry Column in BrcketEntries.Designer.cs">
+      <DependentUpon>201803100419016_Drop old TournamentEntry Column in BrcketEntries.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803100534319_Hopefully getting rid of TournamentEntryID for BracketEntry_id in model to match current state of DB.cs" />
+    <Compile Include="Migrations\201803100534319_Hopefully getting rid of TournamentEntryID for BracketEntry_id in model to match current state of DB.Designer.cs">
+      <DependentUpon>201803100534319_Hopefully getting rid of TournamentEntryID for BracketEntry_id in model to match current state of DB.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803101947003_Adding EntryFee To Pool and Adding PublicKeys.cs" />
+    <Compile Include="Migrations\201803101947003_Adding EntryFee To Pool and Adding PublicKeys.Designer.cs">
+      <DependentUpon>201803101947003_Adding EntryFee To Pool and Adding PublicKeys.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803102009210_Removing PublicKeys.cs" />
+    <Compile Include="Migrations\201803102009210_Removing PublicKeys.Designer.cs">
+      <DependentUpon>201803102009210_Removing PublicKeys.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803102151071_Adding MainAddress to Account.cs" />
+    <Compile Include="Migrations\201803102151071_Adding MainAddress to Account.Designer.cs">
+      <DependentUpon>201803102151071_Adding MainAddress to Account.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803102340115_Make PoolOwner Address Required.cs" />
+    <Compile Include="Migrations\201803102340115_Make PoolOwner Address Required.Designer.cs">
+      <DependentUpon>201803102340115_Make PoolOwner Address Required.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803110149246_Make Entry Fee Decimal.cs" />
+    <Compile Include="Migrations\201803110149246_Make Entry Fee Decimal.Designer.cs">
+      <DependentUpon>201803110149246_Make Entry Fee Decimal.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803110159148_Making Entry Fee Bigger and more precise.cs" />
+    <Compile Include="Migrations\201803110159148_Making Entry Fee Bigger and more precise.Designer.cs">
+      <DependentUpon>201803110159148_Making Entry Fee Bigger and more precise.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Enums\Enums.cs" />
-    <Compile Include="Models\TournamentEntry.cs" />
-    <Compile Include="Models\TournamentGamePick.cs" />
+    <Compile Include="Models\BracketEntry.cs" />
+    <Compile Include="Models\BracketGamePick.cs" />
+    <Compile Include="Models\Pool.cs" />
     <Compile Include="Models\TournamentTeam.cs" />
+    <Compile Include="Models\Roles.cs" />
     <Compile Include="Models\ViewModels\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
-    <Compile Include="Models\ViewModels\UserBracketViewModel.cs" />
+    <Compile Include="Models\ViewModels\PoolBracketViewModel.cs" />
+    <Compile Include="Models\ViewModels\OwnedPoolViewModel.cs" />
+    <Compile Include="Models\ViewModels\BracketViewModel.cs" />
     <Compile Include="Models\ViewModels\ManageViewModels.cs" />
-    <Compile Include="Models\Teams.cs" />
+    <Compile Include="Models\Team.cs" />
+    <Compile Include="Models\ViewModels\PoolViewModel.cs" />
     <Compile Include="Models\ViewModels\TeamFormViewModel.cs" />
     <Compile Include="Models\ViewModels\TournamentViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -1403,12 +1459,9 @@
     <Content Include="Views\Account\ResetPasswordConfirmation.cshtml" />
     <Content Include="Views\Account\SendCode.cshtml" />
     <Content Include="Views\Account\VerifyCode.cshtml" />
-    <Content Include="Views\Manage\AddPhoneNumber.cshtml" />
-    <Content Include="Views\Manage\ChangePassword.cshtml" />
     <Content Include="Views\Manage\Index.cshtml" />
     <Content Include="Views\Manage\ManageLogins.cshtml" />
     <Content Include="Views\Manage\SetPassword.cshtml" />
-    <Content Include="Views\Manage\VerifyPhoneNumber.cshtml" />
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Scripts\umd\popper.min.js.map" />
@@ -1431,6 +1484,14 @@
     <Content Include="truffle\contracts\.placeholder" />
     <Content Include="truffle\test\.placeholder" />
     <Content Include="Views\Bracket\Index.cshtml" />
+    <Content Include="Views\Pool\Index.cshtml" />
+    <Content Include="Views\Pool\Create.cshtml" />
+    <Content Include="Views\Manage\AddPhoneNumber.cshtml" />
+    <Content Include="Views\Manage\ChangePassword.cshtml" />
+    <Content Include="Views\Manage\VerifyPhoneNumber.cshtml" />
+    <Content Include="Views\Users\Index.cshtml" />
+    <Content Include="Views\Manage\Edit.cshtml" />
+    <Content Include="Views\Pool\View.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1450,6 +1511,7 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201802252016025_Initial Migration after reset because of errors with GamePick Foreing Key.resx">
@@ -1466,6 +1528,42 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201803070307456_ChangingHomeOrAway to Enum.resx">
       <DependentUpon>201803070307456_ChangingHomeOrAway to Enum.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803090307248_Naming Improvements and Adding Pool Model.resx">
+      <DependentUpon>201803090307248_Naming Improvements and Adding Pool Model.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803090320375_Creating Pools and PoolBrackets.resx">
+      <DependentUpon>201803090320375_Creating Pools and PoolBrackets.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803090331140_Adding Ref to Owner from BracketEntry.resx">
+      <DependentUpon>201803090331140_Adding Ref to Owner from BracketEntry.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803100358481_Making BracketEntries belong to a single pool.resx">
+      <DependentUpon>201803100358481_Making BracketEntries belong to a single pool.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803100419016_Drop old TournamentEntry Column in BrcketEntries.resx">
+      <DependentUpon>201803100419016_Drop old TournamentEntry Column in BrcketEntries.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803100534319_Hopefully getting rid of TournamentEntryID for BracketEntry_id in model to match current state of DB.resx">
+      <DependentUpon>201803100534319_Hopefully getting rid of TournamentEntryID for BracketEntry_id in model to match current state of DB.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803101947003_Adding EntryFee To Pool and Adding PublicKeys.resx">
+      <DependentUpon>201803101947003_Adding EntryFee To Pool and Adding PublicKeys.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803102009210_Removing PublicKeys.resx">
+      <DependentUpon>201803102009210_Removing PublicKeys.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803102151071_Adding MainAddress to Account.resx">
+      <DependentUpon>201803102151071_Adding MainAddress to Account.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803102340115_Make PoolOwner Address Required.resx">
+      <DependentUpon>201803102340115_Make PoolOwner Address Required.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803110149246_Make Entry Fee Decimal.resx">
+      <DependentUpon>201803110149246_Make Entry Fee Decimal.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803110159148_Making Entry Fee Bigger and more precise.resx">
+      <DependentUpon>201803110159148_Making Entry Fee Bigger and more precise.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

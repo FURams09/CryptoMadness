@@ -21,6 +21,6 @@ namespace March_Madness.Models.ViewModels
 		[MaxLength(30)]
 		public string DisplayName { get; set; }
 
-		public List<Teams> AllTeams { get; set; }
+		public List<Team> AllTeams { get; set; }
 	}
 }

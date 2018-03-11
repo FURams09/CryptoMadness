@@ -26,7 +26,7 @@ namespace March_Madness.Controllers
             var regions = Utility.GetRegionNames();
 
 
-            var seededOrder = _context.TournamentTeam
+            var seededOrder = _context.TournamentTeams
                 .OrderBy(t => t.Seed);
             var east = seededOrder
             .Where(t => t.Region == Regions.East)

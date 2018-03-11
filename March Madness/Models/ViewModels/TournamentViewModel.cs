@@ -13,7 +13,7 @@ namespace March_Madness.Models.ViewModels
        
 		public List<int> Round1PairingOrder { get; set; }
 
-        public List<Teams> Teams { get; set; }
+        public List<Team> Teams { get; set; }
 	
 	}
 }

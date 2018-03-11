@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace March_Madness.Models
 {
-	public class Teams
+	public class Team
 	{
 		public int Id { get; set; }
 

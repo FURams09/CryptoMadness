@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace March_Madness.Models
+namespace March_Madness.Models.ViewModels
 {
     public class ExternalLoginConfirmationViewModel
     {
@@ -64,7 +64,17 @@ namespace March_Madness.Models
 
     public class RegisterViewModel
     {
-        [Required]
+		[Required]
+		[MaxLength(40)]
+		[Display(Name = "UserName")]
+		public string Name { get; set; }
+
+		[Required]
+		[MaxLength(40)]
+		[Display(Name = "Main Address")]
+		public string MainAddress { get; set; }
+
+		[Required]
         [EmailAddress]
         [Display(Name = "Email")]
         public string Email { get; set; }
@@ -109,4 +119,11 @@ namespace March_Madness.Models
         [Display(Name = "Email")]
         public string Email { get; set; }
     }
+
+	public class AddPublicKeyViewModel
+	{
+		public string PublicKey { get; set; }
+
+		public string UserID { get; set; }
+	}
 }

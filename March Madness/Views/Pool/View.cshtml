@@ -1,0 +1,23 @@
+﻿@model March_Madness.Models.ViewModels.PoolBracketViewModel
+@{
+	ViewBag.Title = "View";
+}
+
+<h2>@Model.PoolNickname</h2>
+<h4>@Model.EntriesInPool.Count Entries</h4>
+
+<table id="pool-list" class="table md-col-3">
+
+	@foreach (var item in Model.EntriesInPool)
+	{
+		<tr>
+			<td>
+				@item.BracketOwner.UserName
+			</td>
+			<td>
+				@item.OwnerAddress
+			</td>
+		</tr>
+	}
+
+</table>

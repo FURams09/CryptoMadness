@@ -1,6 +1,8 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Data.Entity;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
@@ -22,8 +24,11 @@ namespace March_Madness.Controllers.API
 		}
 
 		[HttpDelete]
+		[Authorize]
 		public void Delete(int id)
 		{
+
+			bool deleteTournamentTeam = false;
 			try
 			{
 				// TODO: Add delete logic here
@@ -31,11 +36,29 @@ namespace March_Madness.Controllers.API
 
 				if (teamToDelete != null)
 				{
+					if (_context.TournamentTeams.Any(t => t.TeamId == teamToDelete.Id))
+					{
+						ModelState.AddModelError("Tournament Team Exists", "Remove them from tournament before deleting.");
+
+						deleteTournamentTeam = true;
+						throw new Exception();
+					}
 					_context.Teams.Remove(teamToDelete);
+					_context.BracketGamePicks.RemoveRange(_context.BracketGamePicks.Where(t => t.PickedTeamId == id).ToList());
+					_context.TournamentTeams.Where(t => t.TeamId == id);
+
+					if (ModelState.IsValid)
+					{
 					_context.SaveChanges();
-				} else
+					}
+
+				}
+				else
 				{
+
 					throw new HttpResponseException(HttpStatusCode.NotFound);
+
+
 				}
 
 			}
@@ -47,7 +70,7 @@ namespace March_Madness.Controllers.API
 
 		[Route("api/teams/refresh")]
 		[HttpPost]
-		//[Authorize]
+		[Authorize]
 		public IHttpActionResult RefreshTeamList()
 		{
 			try
@@ -72,7 +95,7 @@ namespace March_Madness.Controllers.API
 						var name = HttpUtility.HtmlDecode( item.ChildNodes[1].InnerText);
 						if (_context.Teams.SingleOrDefault(t => t.Name == name) == null)
 						{
-						_context.Teams.Add(new Teams()
+						_context.Teams.Add(new Team()
 							{
 								Name = name
 							});

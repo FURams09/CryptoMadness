@@ -1,0 +1,87 @@
+﻿@model IEnumerable<March_Madness.Models.User>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<table class="table">
+	<tr>
+		<th>
+			@Html.DisplayNameFor(model => model.UserName)
+		</th>
+		<th>
+			@Html.DisplayNameFor(model => model.MainAddress)
+		</th>
+		<th>
+			@Html.DisplayNameFor(model => model.Email)
+		</th>
+		<th>
+			@Html.DisplayNameFor(model => model.EmailConfirmed)
+		</th>
+		<th>
+			@Html.DisplayNameFor(model => model.PhoneNumber)
+		</th>
+		<th>
+			@Html.DisplayNameFor(model => model.PhoneNumberConfirmed)
+		</th>
+		<th>
+			@Html.DisplayNameFor(model => model.TwoFactorEnabled)
+		</th>
+		<th>
+			@Html.DisplayNameFor(model => model.LockoutEndDateUtc)
+		</th>
+		<th>
+			@Html.DisplayNameFor(model => model.LockoutEnabled)
+		</th>
+		<th>
+			@Html.DisplayNameFor(model => model.AccessFailedCount)
+		</th>
+
+		<th></th>
+	</tr>
+
+@foreach (var item in Model) {
+	<tr>
+		<td>
+			@Html.DisplayFor(modelItem => item.Email, new { @readonly = "readonly" })
+		</td>
+		<td>
+			@Html.TextBoxFor(modelItem => item.MainAddress, new { @readonly = "readonly" })
+		</td>
+		<td>
+			@Html.TextBoxFor(modelItem => item.EmailConfirmed, new { @readonly = "readonly" })
+		</td>
+		<td>
+			@Html.DisplayFor(modelItem => item.PhoneNumber, new { @readonly = "readonly" })
+		</td>
+		<td>
+			@Html.DisplayFor(modelItem => item.PhoneNumberConfirmed, new { @readonly = "readonly" })
+		</td>
+		<td>
+			@Html.DisplayFor(modelItem => item.TwoFactorEnabled, new { @readonly = "readonly" })
+		</td>
+		<td>
+			@Html.DisplayFor(modelItem => item.LockoutEndDateUtc, new { @readonly = "readonly" })
+		</td>
+		<td>
+			@Html.DisplayFor(modelItem => item.LockoutEnabled, new { @readonly = "readonly" })
+		</td>
+		<td>
+			@Html.DisplayFor(modelItem => item.AccessFailedCount, new { @readonly = "readonly" })
+		</td>
+		<td>
+			@Html.DisplayFor(modelItem => item.UserName, new { @readonly = "readonly" })
+		</td>
+		<td>
+			<div update
+			<button class="btn btn-primary"> </button>
+            @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
+            @Html.ActionLink("Details", "Details", new { id=item.Id }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.Id })
+		</td>
+	</tr>
+}
+
+</table>

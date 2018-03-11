@@ -30,7 +30,7 @@ namespace March_Madness.Controllers.API
 			var regions = Utility.GetRegionNames();
 
 
-			var seededOrder = _context.TournamentTeam
+			var seededOrder = _context.TournamentTeams
 				.OrderBy(t => t.Seed);
 			var east = seededOrder
 			.Where(t => t.Region == Regions.East)
@@ -107,9 +107,13 @@ namespace March_Madness.Controllers.API
                 
 				if (teamId != 0)
 				{
-					var oldTeam = _context.TournamentTeam.SingleOrDefault(t => (t.Seed == teamAndseed.Key) && t.Region == region);
+					var oldTeam = _context.TournamentTeams.SingleOrDefault(t => (t.Seed == teamAndseed.Key) && t.Region == region);
 					if (oldTeam == null  )
 					{
+						//
+						List<BracketGamePick> oldPicks = _context.BracketGamePicks.Where(t => t.PickedTeamId == oldTeam.Id).ToList();
+						oldPicks.ForEach(p => p.PickedTeamId = teamId);
+
 						var newTeam = new TournamentTeams()
 						{
 							TeamId = teamId,
@@ -117,7 +121,7 @@ namespace March_Madness.Controllers.API
 							Seed = teamAndseed.Key
 						};
 
-						_context.TournamentTeam.Add(newTeam);
+						_context.TournamentTeams.Add(newTeam);
 					}
 					else
 					{

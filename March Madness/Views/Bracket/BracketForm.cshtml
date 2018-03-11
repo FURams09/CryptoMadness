@@ -1,31 +1,41 @@
-﻿@model March_Madness.Models.ViewModels.UserBracketViewModel
+﻿@model March_Madness.Models.ViewModels.BracketViewModel
 @{
 	ViewBag.Title = "BracketForm";
 }
 
 <h2>Bracket Form</h2>
+
 <div class="row">
-	<select id="bracket-selector">
-		<option value=0>New Bracket</option>
-		@foreach (var bracket in Model.UserBrackets)
-		{
+	<div class="form-group col col-sm-3">
+		<select id="bracket-selector" class="custom-select">
+			<option value=0>New Bracket</option>
+			@foreach (var bracket in Model.UserBrackets)
+			{
+				<option value=@bracket.Id @(bracket.Id == Model.TournamentId ? $"selected='selected'" : "")>@bracket.Name</option>
+			}
+		</select>
 
-			<option value=@bracket.Id @(bracket.Id == Model.TournamentId ? $"selected='selected'" : "")>@bracket.Name</option>
-		}
-
-	</select>
+	</div>
+	<div class="form-group col">
+		<input id="bracket-name" class="form-control" placeholder="New Bracket Name" value="@Model.TournamentEntryName" />
+	</div>
 </div>
 <div class="row">
-	<input id="bracket-name" value="@Model.TournamentEntryName"/>
-	<div class="col-md-11">
-		<div id="crypto-madness" style="height: 260px;"></div>
-		
-	</div>
-	<div style="z-index:99999;">
-		<button class="btn btn-primary btn-success" id="submitBracket" >Enter</button>
+	<div style="z-index:99999;" class="form-group">
+		<button class="btn btn-primary btn-success" id="submitBracket">Save Bracket</button>
 	</div>
 
+	<div class="form-group col">
+		<input id="bracket-owner-address" class="form-control" value="@Model.EntryAddress" disabled="disabled"  />
+	</div>
+</div>
 
+
+
+
+
+<div class="col-md-11">
+	<div id="crypto-madness" style="height: 260px;"></div>
 </div>
 
 @Scripts.Render("~/bundles/bracketScripts")
@@ -36,25 +46,17 @@
 	<script type="text/javascript">
 
 
-
-		var teamArray = [];
 		var bracketStore = {
 			isNewBracketShown: true,
 			newBracketNamet: '',
-			newBracketData: []
+			newBracketData: [],
+			allBrackets: {},
+			teamArray: @Html.Raw(Model.TournamentTeams)
 		};
 		$(function () {
-			
-			@foreach (var game in Model.TournamentTeams)
-			{
-				 @Html.Raw($"teamArray.push([[\"{ game[0] }\"], [\"{ game[1]}\"]]);" + Environment.NewLine);
-			}
 
 
-			/*randomly picked bracket put into string, then converted back */
-			$('')
-
-			getTournamentBracket()
+			setTournamentBracket(@Model.TournamentId);
 
 
 			$('#submitBracket').on('click', function () {
@@ -88,47 +90,67 @@
 			});
 
 			$('#bracket-selector').on('change', function () {
-				getTournamentBracket();
+				var $this = $(this);
+				if ($(this).val() == 0) {
+					//repopulate with last new bracket state. 
+					$('#bracket-name').val('');
+				} else {
+					$('#bracket-name').val($(this).children(':selected').text());
+				}
+				setTournamentBracket($this.val());
+
 				if (bracketSave.isNewBracketShown) {
 					//store what state the bracket currently is in
-				} else if ($(this).val() == 0) {
-					//repopulate with last new bracket state. 
+
 				}
-				$('#bracket-name').val('');
+							
 			})
 
 		})
 
-		function getTournamentBracket() {
-			var bracketId = $('#bracket-selector').val();
+		function setTournamentBracket(bracketId) {
 			if (bracketId == 0) {
-				fillBracket();
-				 
+				fillBracket([]);
 			} else {
-				$.ajax({
-					url: '/api/bracket/' + bracketId,
-					method: 'GET',
-					success: function (res) {
-						var initData = {
-							teams: teamArray,
-							results: res /* second round */
-						}
-
-						fillBracket(initData)
-					},
-					failure: function (a, b, c) {
-						console.log(a, b, c);
-					}
-				});
+				var storedBracket = bracketStore.allBrackets[bracketId]
+				if (storedBracket) {
+					fillBracket( storedBracket);
+				} else {
+					getBracketFromServer(bracketId)
+					.then(function(res) {
+						fillBracket(res);
+						bracketStore.allBrackets[bracketId] = { bracket: res.bracket, address: res.address };
+					})
+					.catch(function (err) {
+						console.log(err);
+					})
+				}
 			}
 			
 		}
 
-		function fillBracket(data) {
-			data = data || {
-				teams: teamArray,
-				results: []
+		function getBracketFromServer(bracketId) {
+			return new Promise(function (resolve, reject) {
+				$.ajax({
+					url: '/api/bracket/' + bracketId,
+					method: 'GET',
+					success: function (res) {
+						resolve(res)
+
+					},
+					failure: function (a, b, c) {
+						reject(a);
+					}
+				});
+			});
+		}
+
+		function fillBracket(results) {
+			data = {
+				teams: bracketStore.teamArray,
+				results: results.bracket
 			}
+			$('#bracket-owner-address').val(results.address);
 			$('#crypto-madness')
 				.bracket({
 					init: data, /* data to initialize the bracket with */

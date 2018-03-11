@@ -24,13 +24,19 @@
 				<ul class="nav navbar-nav">
 					<li>@Html.ActionLink("Home", "Index", "Home")</li>
 					<li>@Html.ActionLink("Contact", "Contact", "Home")</li>
-					@*@if (Request.IsAuthenticated)
-		{*@
-					<li>@Html.ActionLink("Teams", "Index", "Teams")</li>
-					<li>@Html.ActionLink("Tournament", "Index", "Tournament")</li>
-					<li>@Html.ActionLink("Bracket", "Index", "Bracket")</li>
-					@* } *@
+					@if (Request.IsAuthenticated)
+					{
+						<li>@Html.ActionLink("Bracket", "Index", "Bracket")</li>
+						<li>@Html.ActionLink("Pools", "Index", "Pool")</li>
+					}
 
+
+					@if (User.IsInRole(March_Madness.Models.Roles.Admin))
+					{
+						<li>@Html.ActionLink("Users", "Index", "Users")</li>
+						<li>@Html.ActionLink("Teams", "Index", "Teams")</li>
+						<li>@Html.ActionLink("Tournament", "Index", "Tournament")</li>
+					}
 				</ul>
                 @Html.Partial("_LoginPartial")
             </div>

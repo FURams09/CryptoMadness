@@ -53,8 +53,7 @@ namespace March_Madness
             // Configure validation logic for passwords
             manager.PasswordValidator = new PasswordValidator
             {
-                RequiredLength = 6,
-                RequireNonLetterOrDigit = true,
+                RequiredLength = 12,
                 RequireDigit = true,
                 RequireLowercase = true,
                 RequireUppercase = true,

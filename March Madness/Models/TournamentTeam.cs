@@ -16,7 +16,7 @@ namespace March_Madness.Models
 
 		public int TeamId { get; set; }
 
-		public Teams Team { get; set; }
+		public Team Team { get; set; }
 
 	}
 }

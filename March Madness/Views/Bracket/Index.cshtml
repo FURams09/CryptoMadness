@@ -1,10 +1,10 @@
-﻿@model IEnumerable<March_Madness.Models.TournamentEntry>
+﻿@model IEnumerable<March_Madness.Models.BracketEntry>
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Brackets";
 }
 
-<h2>Index</h2>
+<h2>@User.Identity.Name's Brackets</h2>
 
 <p>
     @Html.ActionLink("New", "BracketForm")
@@ -14,14 +14,13 @@
 		<th>
 			@Html.DisplayNameFor(model => model.Name)
 		</th>
-		<th></th>
 	</tr>
 
 	@foreach (var item in Model)
 	{
 		<tr>
 			<td>
-				@Html.ActionLink(item.Name, "BracketForm", new { id = item.Id })
+				@Html.ActionLink(item.Name, "BracketForm", new { bracketId = item.Id })
 			</td>
 
 		</tr>

@@ -7,9 +7,11 @@ using Microsoft.AspNet.Identity;
 using March_Madness.Models;
 using March_Madness.Models.ViewModels;
 using March_Madness.Helpers;
+using Newtonsoft.Json;
 
 namespace March_Madness.Controllers
 {
+	[Authorize]
     public class BracketController : Controller
     {
 		private ApplicationDbContext _context;
@@ -34,7 +36,7 @@ namespace March_Madness.Controllers
 			{
 				for (int i = 0; i < round1Pos.Count; i++)
 				{
-					Teams teamName = region.Value.First(t => t.Seed == round1Pos[i]).Team;
+					Team teamName = region.Value.First(t => t.Seed == round1Pos[i]).Team;
 					if (i % 2 == 0)
 					{
 						jQueryBracket.Add(new List<string>() { teamName.Name });
@@ -46,14 +48,14 @@ namespace March_Madness.Controllers
 				}
 			}
 
-			var userBracket = _context.TournamentEntry.Where(t => t.UserId == userID);
+			var userBrackets = _context.BracketEntries.Where(t => t.UserId == userID);
 
-			UserBracketViewModel userBracketView = new UserBracketViewModel()
+			BracketViewModel userBracketView = new BracketViewModel()
 			{
-				UserBrackets = userBracket.ToList(),
-				TournamentTeams = jQueryBracket,
+				UserBrackets = userBrackets.ToList(),
+				TournamentTeams = JsonConvert.SerializeObject( jQueryBracket),
 				TournamentId = bracketID
-
+			
 			};
             return View("BracketForm", userBracketView);
         }
@@ -61,7 +63,7 @@ namespace March_Madness.Controllers
 		public ViewResult Index()
 		{
 			string user = User.Identity.GetUserId();
-		    List<TournamentEntry> userEntries =	_context.TournamentEntry.Where(t => t.UserId == user).ToList();
+		    List<BracketEntry> userEntries =	_context.BracketEntries.Where(t => t.UserId == user).ToList();
 
 			return View("Index", userEntries);
 		}

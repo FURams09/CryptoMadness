@@ -1,4 +1,4 @@
-﻿@model IEnumerable<March_Madness.Models.Teams>
+﻿@model IEnumerable<March_Madness.Models.Team>
 
 @{
     ViewBag.Title = "Index";
@@ -50,11 +50,21 @@
 				{
 					url: '/api/teams/' + $this.data('team-id'),
 					method: 'DELETE',
-					success: function () {
-						$this.parent().parent('tr').remove();
+					success: function (d, ts, xhr) {
+						if (ts == 'TriedToDeleteTournamentTeam') {
+							
+						}
+						else {
+							$this.parent().parent('tr').remove();
+						}
+						
 					},
 					error: function (a, b, c, d) {
-						alert('delete failed');
+						if (a.status == 400) {
+							alert('Can\'t delete team in the tournamet. Remove them from the Tournament Page before deleting this team');
+						} else {
+							alert('Delete Failed');
+						}
 						console.log(a, b, c);
 					}
 				}

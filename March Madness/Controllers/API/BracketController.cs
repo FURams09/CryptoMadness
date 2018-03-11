@@ -9,9 +9,11 @@ using Microsoft.AspNet.Identity;
 using March_Madness.Models;
 using March_Madness.Models.ViewModels;
 using March_Madness.Helpers;
+using System.ComponentModel.DataAnnotations;
 
 namespace March_Madness.Controllers.API
 {
+	[Authorize]
     public class BracketController : ApiController
     {
 		private ApplicationDbContext _context;
@@ -24,23 +26,23 @@ namespace March_Madness.Controllers.API
 		[Route("api/bracket/save")]
 		[HttpPost]
 		//[Authorize]
-		public IHttpActionResult SaveBracket(UserBracketViewModel bracket)
+		public IHttpActionResult SaveBracket(BracketViewModel bracket)
 		{
 			try
 			{
-				TournamentEntry tournamentBracket;
+				BracketEntry tournamentBracket;
 				string currentUserId = User.Identity.GetUserId();
 				bool isNewBracket = false;
 
-				tournamentBracket = _context.TournamentEntry.Include(t => t.Picks).SingleOrDefault(t => t.Id == bracket.TournamentId);
+				tournamentBracket = _context.BracketEntries.Include(t => t.Picks).SingleOrDefault(t => t.Id == bracket.TournamentId);
 				if (tournamentBracket == null )
 				{
 					var bracketName = bracket.TournamentEntryName is null ? User.Identity.Name + ' ' + DateTime.Now.ToShortDateString() : bracket.TournamentEntryName;
-					tournamentBracket = new TournamentEntry()
+					tournamentBracket = new BracketEntry()
 					{
 						UserId = currentUserId,
 						Name = bracketName,
-						Picks = new List<TournamentGamePick>()
+						Picks = new List<BracketGamePick>()
 					};
 					isNewBracket = true;
 				} 
@@ -50,7 +52,7 @@ namespace March_Madness.Controllers.API
 
 				List<TournamentTeams> currentPicks = new List<TournamentTeams>() ;
 
-				List<TournamentGamePick> currentBracket = new List<TournamentGamePick>();
+				List<BracketGamePick> currentBracket = new List<BracketGamePick>();
 
 				var round1Seeds = Utility.Round1PairingOrder;
 				List<int> roundsGame1 = new List<int>();
@@ -125,10 +127,10 @@ namespace March_Madness.Controllers.API
 							
 							currentPicks.Add(winner);
 
-							TournamentGamePick pick;
+							BracketGamePick pick;
 							if (isNewBracket)
 							{
-								pick = new TournamentGamePick()
+								pick = new BracketGamePick()
 								{
 									RoundNo = i,
 									GameNo = j,
@@ -143,7 +145,7 @@ namespace March_Madness.Controllers.API
 								var currentPick = tournamentBracket.Picks.Single(t => t.RoundNo == i & t.GameNo == j);
 								if (currentPick == null)
 								{
-									pick = new TournamentGamePick()
+									pick = new BracketGamePick()
 									{
 										RoundNo = i,
 										GameNo = j,
@@ -169,7 +171,7 @@ namespace March_Madness.Controllers.API
 				}
 				if (isNewBracket)
 				{
-					_context.TournamentEntry.Add(tournamentBracket);
+					_context.BracketEntries.Add(tournamentBracket);
 				}
 				
 				if (ModelState.IsValid)
@@ -194,8 +196,20 @@ namespace March_Madness.Controllers.API
 		public IHttpActionResult GetBracket(int bracketId)
 		{
 			var utl = new Utility();
+			string bracketAddress = _context.BracketEntries.First(be => be.Id == bracketId).OwnerAddress ;
+			return Ok(new BracketEntryViewModel()
+			{
+				Bracket = utl.GetIndividualBracket(bracketId).ToArray(),
+				Address = bracketAddress
+			});
+		}
 
-			return Ok(utl.GetIndividualBracket(bracketId).ToArray());
+		public class BracketEntryViewModel
+		{
+			[MaxLength(42)]
+			public string Address { get; set; }
+
+			public List<List<int>>[] Bracket { get; set; }
 		}
 	}
 

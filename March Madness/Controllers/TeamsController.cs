@@ -58,7 +58,7 @@ namespace March_Madness.Controllers
         // POST: Team/Edit/5
 		[ValidateAntiForgeryToken]
         [HttpPost]
-        public ActionResult Save(Teams teamModel)
+        public ActionResult Save(Team teamModel)
         {
 			var allTeams = _utility.GetAllTeams();
 			TeamFormViewModel tfViewModel;

@@ -6,11 +6,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace March_Madness.Models
 {
-	public class TournamentGamePick
+	public class BracketGamePick
 	{
 		public int Id { get; set; }
 
-		public int TournamentEntryID { get; set; }
+		public int BracketEntryId { get; set; }
 
 		public int RoundNo { get; set; }
 

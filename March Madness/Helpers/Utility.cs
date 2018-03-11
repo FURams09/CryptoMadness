@@ -24,7 +24,7 @@ namespace March_Madness.Helpers
 			return Enum.GetNames(typeof(Regions)).ToList();
 		}
 
-		public IQueryable<Teams> GetAllTeams()
+		public IQueryable<Team> GetAllTeams()
 		{
 			return _context.Teams.OrderBy(t => t.Name);
 		}
@@ -42,7 +42,7 @@ namespace March_Madness.Helpers
 				{ Regions.South, new List<TournamentTeams>(regionTeams) }
 			};
 
-			var tournamentTeams = _context.TournamentTeam.Include(t => t.Team)
+			var tournamentTeams = _context.TournamentTeams.Include(t => t.Team)
 				.ToList();
 
 			foreach (TournamentTeams team in tournamentTeams)
@@ -63,13 +63,13 @@ namespace March_Madness.Helpers
 				bracket.Add(new List<List<int>>());
 			}
 
-			var tournamentTeams = _context.TournamentGame
-				.Where(t => t.TournamentEntryID == bracketId)
+			var tournamentTeams = _context.BracketGamePicks
+				.Where(t => t.BracketEntryId == bracketId)
 				.OrderBy(t => new { t.RoundNo, t.GameNo})
 				.Include(t => t.PickedTeam)
 				.ToList();
 
-			foreach (TournamentGamePick game in tournamentTeams)
+			foreach (BracketGamePick game in tournamentTeams)
 			{
 				var gameList = new List<int>() { 0, 0 };
 				switch (game.HomeOrAway)

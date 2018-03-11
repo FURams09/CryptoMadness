@@ -7,6 +7,8 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using March_Madness.Models;
+using March_Madness.Models.ViewModels;
+using System.Net;
 
 namespace March_Madness.Controllers
 {
@@ -15,6 +17,7 @@ namespace March_Madness.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
+
 
         public ManageController()
         {
@@ -61,6 +64,8 @@ namespace March_Madness.Controllers
                 : message == ManageMessageId.Error ? "An error has occurred."
                 : message == ManageMessageId.AddPhoneSuccess ? "Your phone number was added."
                 : message == ManageMessageId.RemovePhoneSuccess ? "Your phone number was removed."
+				: message == ManageMessageId.AccountUpdated ? "Your account was successfully updated"
+				: message == ManageMessageId.UserNotFound ? "Error finding Account"
                 : "";
 
             var userId = User.Identity.GetUserId();
@@ -70,8 +75,10 @@ namespace March_Madness.Controllers
                 PhoneNumber = await UserManager.GetPhoneNumberAsync(userId),
                 TwoFactor = await UserManager.GetTwoFactorEnabledAsync(userId),
                 Logins = await UserManager.GetLoginsAsync(userId),
-                BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(userId)
-            };
+                BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(userId),
+				UserName = UserManager.FindById(userId).UserName,
+				MainAddress = UserManager.FindById(userId).MainAddress
+			};
             return View(model);
         }
 
@@ -322,7 +329,65 @@ namespace March_Madness.Controllers
             return result.Succeeded ? RedirectToAction("ManageLogins") : RedirectToAction("ManageLogins", new { Message = ManageMessageId.Error });
         }
 
-        protected override void Dispose(bool disposing)
+		[Authorize]
+		public async Task<ActionResult> Edit(ManageMessageId? message)
+		{
+			ViewBag.StatusMessage = message == ManageMessageId.Error ? "An error has occurred."
+				: message == ManageMessageId.UserNotFound ? "Error finding Account"
+				: "";
+			var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+			if (user != null)
+			{
+				UserViewModel updatingUser = new UserViewModel()
+				{
+					UserId = user.Id,
+					Email = user.Email,
+					MainAddress = user.MainAddress,
+					UserName = user.UserName,
+					PhoneNumber = user.PhoneNumber
+				};
+				return View(updatingUser);
+			}
+			else
+			{
+				return View("Index", new { message = ManageMessageId.UserNotFound });
+			}
+
+			
+		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public ActionResult Edit(UserViewModel updatedUser)
+		{
+			if (updatedUser.UserId == null)
+			{
+				return View(new UserViewModel { });
+			}
+			User user = UserManager.FindById(updatedUser.UserId);
+			if (user == null)
+			{
+				return View("Edit", new { message = ManageMessageId.UserNotFound });
+			}
+
+			user.UserName = updatedUser.UserName;
+			user.Email = updatedUser.Email;
+			user.MainAddress = updatedUser.MainAddress;
+			user.PhoneNumber = updatedUser.PhoneNumber;
+
+			if (ModelState.IsValid)
+			{
+				UserManager.Update(user);
+				return RedirectToAction("Index", "Manage", new { message = ManageMessageId.AccountUpdated });
+			}
+			else
+			{
+				return View(updatedUser);
+			}
+
+
+		}
+		protected override void Dispose(bool disposing)
         {
             if (disposing && _userManager != null)
             {
@@ -381,7 +446,10 @@ namespace March_Madness.Controllers
             SetPasswordSuccess,
             RemoveLoginSuccess,
             RemovePhoneSuccess,
-            Error
+			AccountUpdated,
+			UserNotFound,
+
+			Error
         }
 
 #endregion
