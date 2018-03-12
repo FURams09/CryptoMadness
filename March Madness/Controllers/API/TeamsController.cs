@@ -27,8 +27,6 @@ namespace March_Madness.Controllers.API
 		[Authorize]
 		public void Delete(int id)
 		{
-
-			bool deleteTournamentTeam = false;
 			try
 			{
 				// TODO: Add delete logic here
@@ -40,7 +38,6 @@ namespace March_Madness.Controllers.API
 					{
 						ModelState.AddModelError("Tournament Team Exists", "Remove them from tournament before deleting.");
 
-						deleteTournamentTeam = true;
 						throw new Exception();
 					}
 					_context.Teams.Remove(teamToDelete);

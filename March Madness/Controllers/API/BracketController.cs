@@ -68,7 +68,6 @@ namespace March_Madness.Controllers.API
 						if (!(game[0] == 1 ^ game[1] == 1) || game.Count > 2)
 						{
 							currentPicks.Add(new TournamentTeams() { TeamId = 0 });
-							continue; //for debugging. Remove once filling out is done
 							return BadRequest(); //This game doesn't have only 1 winner
 						}
 						else

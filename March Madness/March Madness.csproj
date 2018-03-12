@@ -605,6 +605,12 @@
       <DependentUpon>jquery.bracket.scss</DependentUpon>
     </Content>
     <Content Include="Content\jquery.bracket.min.css" />
+    <Content Include="Contracts\scripts\MarchMadness.js" />
+    <Content Include="Contracts\contracts\MarchMadness.sol" />
+    <Content Include="Contracts\contracts\Migrations.sol" />
+    <Content Include="Contracts\migrations\1_initial_migration.js" />
+    <Content Include="Contracts\migrations\2_first_deployment.js" />
+    <Content Include="Contracts\truffle-config.js" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
@@ -1137,7 +1143,6 @@
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
-    <Content Include="Scripts\contracts.js" />
     <Content Include="Scripts\esm\popper-utils.js" />
     <Content Include="Scripts\esm\popper-utils.min.js" />
     <Content Include="Scripts\esm\popper.js" />
@@ -1400,6 +1405,8 @@
     <Content Include="node_modules\xmlhttprequest\LICENSE" />
     <Content Include="node_modules\xmlhttprequest\package.json" />
     <Content Include="node_modules\xmlhttprequest\README.md" />
+    <Content Include="Contracts\build\contracts\MarchMadness.json" />
+    <Content Include="Contracts\build\contracts\Migrations.json" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.3.1.js" />
     <Content Include="Scripts\jquery-3.3.1.min.js" />
@@ -1426,14 +1433,6 @@
     <Content Include="Scripts\umd\popper.js" />
     <Content Include="Scripts\umd\popper.min.js" />
     <Content Include="Scripts\Utility.js" />
-    <Content Include="truffle\contracts\ConvertLib.sol" />
-    <Content Include="truffle\contracts\MetaCoin.sol" />
-    <Content Include="truffle\contracts\Migrations.sol" />
-    <Content Include="truffle\migrations\1_initial_migration.js" />
-    <Content Include="truffle\migrations\2_deploy_contracts.js" />
-    <Content Include="truffle\test\metacoin.js" />
-    <Content Include="truffle\test\TestMetacoin.sol" />
-    <Content Include="truffle\truffle-config.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -1478,11 +1477,6 @@
     <Content Include="Views\Tournament\TournamentForm.cshtml" />
     <Content Include="Views\Bracket\BracketForm.cshtml" />
     <Content Include="secrets.config" />
-    <Content Include="truffle\build\contracts\ConvertLib.json" />
-    <Content Include="truffle\build\contracts\MetaCoin.json" />
-    <Content Include="truffle\build\contracts\Migrations.json" />
-    <Content Include="truffle\contracts\.placeholder" />
-    <Content Include="truffle\test\.placeholder" />
     <Content Include="Views\Bracket\Index.cshtml" />
     <Content Include="Views\Pool\Index.cshtml" />
     <Content Include="Views\Pool\Create.cshtml" />
@@ -1495,6 +1489,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Contracts\test\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

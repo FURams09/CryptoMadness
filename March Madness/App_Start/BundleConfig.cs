@@ -27,7 +27,7 @@ namespace March_Madness
 		    bundles.Add(new ScriptBundle("~/bundles/truffle-contracts").Include(
                 "~/bower_components/web3/dist/web3.min.js",
                 "~/node_modules/truffle-contract/dist/truffle-contract.js",
-                "~/Scripts/contracts.js"
+                "~/Contracts/scripts/MarchMadness.js"
                 ));
 
 			bundles.Add(new StyleBundle("~/Content/css").Include(

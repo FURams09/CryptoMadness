@@ -4,32 +4,86 @@
 	ViewBag.Title = "Create";
 }
 
-<h2>Create</h2>
+<h2>New Bracket</h2>
 
-@using (Html.BeginForm())
-{
-	@Html.AntiForgeryToken()
 
-	<div class="form-horizontal">
-		<h4>PoolBrackets</h4>
-		<hr />
-		@Html.ValidationSummary(true, "", new { @class = "text-danger" })
-		<div class="form-group">
-			@Html.LabelFor(model => model.Nickname, htmlAttributes: new { @class = "control-label col-md-2" })
-			<div class="col-md-10">
-				@Html.EditorFor(model => model.Nickname, new { htmlAttributes = new { @class = "form-control" } })
-				@Html.ValidationMessageFor(model => model.Nickname, "", new { @class = "text-danger" })
-			</div>
-		</div>
-
-		<div class="form-group">
-			<div class="col-md-offset-2 col-md-10">
-				<input type="submit" value="Create" class="btn btn-default" />
-			</div>
+<div id="create-form" class="form-horizontal">
+	<hr />
+	@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+	<div class="form-group">
+		@Html.LabelFor(model => model.Nickname, htmlAttributes: new { @class = "control-label col-md-2" })
+		<div class="col-md-10">
+			@Html.EditorFor(model => model.Nickname, new { htmlAttributes = new { @class = "form-control", id ="nickname" } })
+			@Html.ValidationMessageFor(model => model.Nickname, "", new { @class = "text-danger" })
 		</div>
 	</div>
-}
+	<div class="form-group">
+		<div class="col-md-10">
+			<label class="col-md-2 control-label">Public Pool Address</label>
+			<input class="form-control" id="public-pool-address">
+		</div>
+	</div>
+	<div class="form-group">
+		<div class="col-md-10">
+			<input class="form-control" id="password" placeholder="Password" type="password">
+		</div>
+	</div>
+	<div class="form-group">
+		<div class="col-md-10">
+			<input class="form-control" id="confirm-password" placeholder="Confirm Password" type="password">
+		</div>
+	</div>
+	<div class="form-group">
+		<div class="col-md-10">
+			<input class="form-control" id="entry-fee" max="9999" maxlength="11" placeholder="Entry Fee">
+		</div>
+	</div>
+
+	<div class="form-group">
+		<div class="col-md-offset-2 col-md-10">
+			<button value="" id="create-pool" class="btn btn-default">Create Pool</button>
+		</div>
+	</div>
+</div>
 
 <div>
 	@Html.ActionLink("Back to List", "Index")
-</div>
+</div>	
+
+@section scripts 
+{
+	<script type="text/javascript">
+		$(function () {
+
+			$('#create-pool').on('click', function () {
+				if ($('#password').val() !== $('#confirm-password').val()) {
+					$('#confirm-password').addClass('is-invalid')
+					return false;
+				}
+				if (isNaN(parseFloat($('#entry-fee').val()))) {
+					$('#entry-fee').addClass('is-invalid')
+					return false;
+				}
+
+				if (confirm('Once Created You won\'t be able to change the password or change the Fee. If the fee is 0 there will be no reward for this pool. If there\'s no address one will be created')) {
+					var pw = 'c87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3';
+					$.ajax({
+						url: '/api/Pool/Update',
+						method: 'POST',
+						data: {poolId: 0, nickname: $('#nickname').val(), entryFee: $('#entry-fee').val(), address: web3.eth.accounts[0]},
+						success: function (res) {
+							MarchMadnessApp.ContractCalls.createPool(res.address, $('#password').val(), res.poolId);
+						},
+						fail: function (err) {
+							console.log(err);
+						}
+
+					});
+				}
+			});
+
+		})
+
+
+	</script>
+	}

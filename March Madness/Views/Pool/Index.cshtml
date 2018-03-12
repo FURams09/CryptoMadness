@@ -9,7 +9,11 @@
 	@Html.ActionLink("New Pool", "Create")
 </p>
 <table id="pool-list" class="table md-col-3">
-
+	<tr>
+		<th>Nickname</th>
+		<th>Entry Fee</th>
+		<th>Pool Owner Address</th>
+	</tr>
 	@foreach (var item in Model.OwnedPools)
 	{
 		<tr>
@@ -19,19 +23,21 @@
 					<div class="form-control">
 
 						@Html.TextBoxFor(m => item.Nickname,
-						  new { @class = "form-control nickname", required = "required" })
+							   new { @class = "form-control nickname", required = "required" })
 
 					</div>
-					<div class="form-control">
-						@Html.TextBoxFor(m => item.EntryFee,
-						  new { @class = "form-control entry-fee", required = "required" })
+					<div>
 
 					</div>
+
 					<div>
 						<button class="btn btn-warning" style="display:none;">Update</button>
 					</div>
 
 				</div>
+			</td>
+			<td>
+				@item.EntryFee
 			</td>
 			<td>
 				@item.OwnerAddress
@@ -51,24 +57,28 @@
 				updateButton.attr('disabled', 'disabled');
 				updateButton.addClass('btn-danger').removeClass('btn-warning');
 				updateButton.off('click');
-			}
+			};
 
-			if ($this.val() === '' || $this.val() == 0) {
+			if ($this.val() === '') {
 				disableUpdate();
 			} else if (updateButton.is(':hidden') || updateButton.hasClass('btn-danger')) {
 				updateButton.show();
+				updateButton.text('Update');
 				updateButton.removeAttr('disabled');
-				updateButton.removeClass('btn-danger').addClass('btn-warning');
+				updateButton.removeClass('btn-danger').removeClass('btn-success').addClass('btn-warning');
 				updateButton.on('click', function () {
 					var oldValue = $this.val()
-					if ($this.val() === '' || $this.val() == 0 ) { disableUpdate(); }
+					if ($this.val() === '') {
+						disableUpdate();
+					}
 					var parent_group = $this.parent().parent();
+
 					$.ajax({
 						url: '/api/Pool/Update',
 						method: 'POST',
 						dataType: 'json',
 						data: { Nickname: parent_group.find('.nickname').val(), PoolId: parent_group.find("[id^='hidden-id']").val(), EntryFee: parent_group.find('.entry-fee').val(), Address: '0x0' },
-						success: function () {
+						success: function (newPool) {
 							updateButton.off('click');
 							updateButton.removeClass('btn-danger').removeClass('btn-warning').addClass('btn-success').text('Saved');
 							setTimeout(function () {
@@ -77,17 +87,18 @@
 							}, 4000)
 
 						},
-						failure: (a) => { console.log(a) }
+						failure: function (a) {
+							console.log(a)
+						}
 					});
-
 				});
 			}
 		}
-		$(function () {
-			$('#pool-list').on("keyup", "input.form-control", function () {
-				handleChange($(this));
-			});
-		})
+			$(function () {
+				$('#pool-list').on("keyup", "input.form-control", function () {
+					handleChange($(this));
+				});
+			})
 
 
 	</script>

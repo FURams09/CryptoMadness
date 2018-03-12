@@ -26,14 +26,22 @@ namespace March_Madness.Controllers.API
 
 			if (updatingPool == null)
 			{
-				return NotFound();
+				updatingPool = new Pool()
+				{
+					OwnerAddress = updatePool.Address,
+					EntryFee = updatePool.EntryFee,
+				};
+			} else
+			{
+				updatingPool.Nickname = updatePool.Nickname;
 			}
-			updatingPool.Nickname = updatePool.Nickname;
-			updatingPool.EntryFee = updatePool.EntryFee ;
+			
 			//Don't have reason to update address yet. too important to risk overwriting
 			if (ModelState.IsValid)
 			{
 				_context.SaveChanges();
+				updatePool.Address = updatingPool.OwnerAddress;
+				updatePool.EntryFee = updatingPool.EntryFee;
 				return Ok(updatePool);
 			}
 

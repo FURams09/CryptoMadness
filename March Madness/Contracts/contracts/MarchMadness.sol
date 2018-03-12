@@ -6,13 +6,14 @@ contract MarchMadness {
 
   uint LockTime;
 
-  uint72 EntryFee; //what we take
-  uint72 PoolFee; //what we take
-  uint72 SalesCommission; //
+  uint public EntryFee; //what we take
+  uint public PoolFee; //what we take
+  uint public SalesCommission; //
 
   mapping(address => bool) ContractAdmins;
 
-  mapping(uint16 => uint) Pools;
+  mapping(uint16 => uint) Pools; //poolId to entry fee in Wei
+  mapping(uint16 => uint) PoolValue; //poolId to poolsTotalEntryFeeCollected
   mapping(uint16 => address) PoolOwners;
   
 
@@ -49,6 +50,7 @@ contract MarchMadness {
     NoBracketToValidate,
     SubmittedAndFinalBracketMismatch, 
     PoolValueGreaterThanTotalPayout,
+	PoolFeeNotMet,
     EntryFeeNotMet,
     PoolOverflow,
     SellingEmptyBracket,
@@ -60,7 +62,8 @@ contract MarchMadness {
  
 
 
-  event PoolCreated(address owner, uint16 index, uint fee);
+  event PoolCreated(address owner, uint indexed poolId, uint fee);
+  event BracketCreated(address owner, uint indexed poolId, bytes32 bracket);
   mapping(address => uint) charityHold;
   event DonationReceived(address donor, uint amountDonated);
   event DonationRefunded(address donor, uint amountRefunded, uint donationLeft);
@@ -72,7 +75,7 @@ contract MarchMadness {
   }
 
   modifier isAdmin() {
-    require(ContractAdmins[msg.sender]);
+    require(ContractAdmins[msg.sender] == true);
     _;
   }
 
@@ -85,11 +88,11 @@ contract MarchMadness {
 
 
 
-  function MarchMadness(uint16 poolFee, uint lockBracketsAfter, uint16 entryFee, uint16 salesCommission) public {
-    ContractAdmins[Owner] = true;
-    PoolFee = poolFee * 1 ether;
-    EntryFee = entryFee * 1 ether;
-    SalesCommission = salesCommission * 1 ether;
+  function MarchMadness(uint poolFee, uint lockBracketsAfter, uint entryFee, uint16 salesCommission) public {
+    ContractAdmins[msg.sender] = true;
+    PoolFee = poolFee;
+    EntryFee = entryFee;
+    SalesCommission = salesCommission;
     LockTime = now + lockBracketsAfter;
     
     OwnershipUpdated(0x0, Owner);
@@ -97,47 +100,39 @@ contract MarchMadness {
 
 
 
-  function transferOwner(address newOwner) public isAdmin {
-    require(ContractAdmins[newOwner] == true);
-    Owner = newOwner;
-    OwnershipUpdated(msg.sender, Owner);
-  }
-
   function addAdmin(address newAdmin) public isAdmin {
+	require(newAdmin != 0x0);
     ContractAdmins[newAdmin] = true;
   }
 
   function removeAdmin(address removedAdmin) public isAdmin {
-    var adminToRemove memory = removeAdmin;
-    require (msg.sender == removeAdmin);
+    require(msg.sender != removedAdmin);
     ContractAdmins[removedAdmin] = false;
   }
 
-
-  function updateEntryFee(uint16 newFeeInEth) public isAdmin { 
-    EntryFee = newFeeInEth * 1 ether;
+  function updateEntryFee(uint newFee) public isAdmin { 
+    EntryFee = newFee;
   }
 
-  function updatePoolFee(uint16 newFeeInEth) public isAdmin {
-    PoolFee = newFeeInEth * 1 ether;
+  function updatePoolFee(uint newFee) public isAdmin {
+    PoolFee = newFee;
   }
 
-  function updateSalesCommission(uint16 newFeeInEth) public isAdmin {
-    SalesCommission = newFeeInEth * 1 ether;
+  function updateSalesCommission(uint newFee) public isAdmin {
+    SalesCommission = newFee;
+  }
+  
+  function secondsUntilLock() public view returns (uint secondsLeft) {
+	return LockTime - now;
   }
 
-
-  function getContractBalance() isAdmin public returns(uint contractValueInEth, uint totalPayoutsDueInEth, uint totalCharityInEth) {
-    contractValueInEth = this.balance / 1  ether;
-    totalPayoutsDueInEth = TotalPayouts / 1 ether;
-    totalCharityInEth = TotalCharity / 1 ether;
-
+  function getContractValue() public view isAdmin returns (uint) {
+  	  return this.balance;
   }
-
 
   //handled
-  function withdrawFunds(address withdrawTo, uint amountInEth) public isAdmin returns (bool) {
-    if (this.balance - (amountInEth * 1 ether) < TotalPayouts) {
+  function withdrawFunds(address withdrawTo, uint amount) public isAdmin returns (bool) {
+    if (this.balance - (amount) < TotalPayouts) {
       PaymentError(withdrawTo, ErrorCode.PoolValueGreaterThanTotalPayout, "Not Enough Funds in Contract to Cover TotalPayout");
       return false;
     }
@@ -145,72 +140,60 @@ contract MarchMadness {
     if (withdrawTo == 0x0) { 
       withdrawTo = Owner;
     }
-    withdrawTo.transfer(amountInEth * 1 ether);
+    withdrawTo.transfer(amount);
     PaymentMade(withdrawTo, address(this), PaymentCode.AuthorizedWithdraw);
   }
 
 
-
-  function createPool(uint16 pool, uint16 feeInEth) public payable tournamentNotStarted {
-    require(PoolOwners[pool] == 0x0);
-    require(msg.value >= PoolFee * 1 ether);
-    Pools[pool] = feeInEth * 1 ether;
+  function createPool(uint16 pool, uint fee) public payable tournamentNotStarted {
+    // require(PoolOwners[pool] == 0x0);
+    if (msg.value < PoolFee) {
+      PaymentError(msg.sender, ErrorCode.PoolFeeNotMet, "Insufficient fee to cover pool creation");
+      return;
+    }
+    Pools[pool] = fee;
     PoolOwners[pool] = msg.sender;
-    PoolCreated(msg.sender, pool, feeInEth);
+    PoolCreated(PoolOwners[pool], pool, Pools[pool]);
   }
 
-  function getPoolValueInEth(uint16 pool) public returns (uint) {
-    require (isAddressContractAdmin(msg.sender) || isAddressPoolOwner(msg.sender, pool) || isAddressInPool(msg.sender, pool));
-    return Pools[pool] / 1 ether;
+  function getPoolValue(uint16 pool) public view returns (uint) {
+    //require (isAddressContractAdmin(msg.sender) || isAddressPoolOwner(msg.sender, pool) || isAddressInPool(msg.sender, pool));
+    return PoolValue[pool];
   }
+
+  function getPoolEntryFee(uint16 pool) public view returns(uint) {
+    return Pools[pool];
+  }
+
   //eventually pass the hashed bracked
-  function createBracket(string bracket, uint16 pool)  public payable tournamentNotStarted returns(bool) {
-    if (msg.value < Pools[pool] + EntryFee) {
+  function createBracket(bytes32 bracket, uint16 poolId)  public payable tournamentNotStarted {
+    uint poolEntryFee = Pools[poolId];
+    uint poolValue = PoolValue[poolId];
+    if (msg.value < poolEntryFee + EntryFee) {
       BracketError(msg.sender, ErrorCode.EntryFeeNotMet, "Pool and Entry fee not met");
-      return false;
+      return;
     }
-    if (Pools[pool] + EntryFee > Pools [pool]) {
+    
+    if (poolValue + poolEntryFee < poolValue) {
       BracketError(msg.sender, ErrorCode.PoolOverflow, "Pool value would overflow with more brackets");
-      return false;
+      return;
     }
 
-    Entries[msg.sender] = pool;
-    BracketStore[msg.sender] = keccak256(bracket);
+    Entries[msg.sender] = poolId;
+    BracketStore[msg.sender] = bracket;
     TotalPayouts += msg.value - EntryFee;
-    return true;
+    PoolValue[poolId] += poolEntryFee;
+    BracketCreated(msg.sender, Entries[msg.sender],BracketStore[msg.sender]);
   }
 
 
-  function updateBracket(string bracket) public tournamentNotStarted {
+  function updateBracket(bytes32 bracket) public tournamentNotStarted {
     require(Entries[msg.sender] != 0);
-    BracketStore[msg.sender] = keccak256(bracket);
+    BracketStore[msg.sender] = bracket;
   }
  
 
-  // function sellBracket(address newOwner, uint saleAmountInEth) public payable returns (bool) {
-  //   if (msg.value < (saleAmountInEth * 1 ether) + SalesCommission) {
-  //     SalesError(msg.sender, ErrorCode.InsufficientValueForSale, "Insufficient value to cover sale");
-  //     return false;
-  //   }
-
-  //   if (BracketStore[msg.sender] == 0x0) {
-  //     SalesError(msg.sender, ErrorCode.SellingEmptyBracket, "Attempted to sell Empty Bracket");
-  //     return false;
-  //   }
-
-  //   if (Pools[Entries[msg.sender]] == 0x0) {
-  //     SalesError(msg.sender)
-  //   }
-
-  //   msg.sender.transfer(saleAmountInEth * 1 ether);
-  //   Entries[newOwner] = Entries[msg.sender];
-  //   BracketStore[newOwner] = BracketStore[msg.sender];
-  //   Entries[msg.sender] = 0;
-  //   BracketStore[msg.sender] = 0x0;
-  //   PaymentMade(msg.sender, newOwner, PaymentCode.Sale);
-  // }
-
-  function payWinner(address winner, uint16 pool, bytes32 bracket)  public payable isAdmin returns(bool) {
+  function payWinner(address winner, uint16 pool, bytes32 bracket)  public payable isAdmin isPoolOwner(pool) returns(bool) {
       if (bracket == 0) {
         PaymentError(winner, ErrorCode.NoBracketToValidate, "No Bracket Passed for Validation");
         return false;
@@ -220,15 +203,11 @@ contract MarchMadness {
         return false;
       }
 
-      if (Pools[pool] == 0) {
-        PaymentError(winner, ErrorCode.PoolValueGreaterThanTotalPayout, "Pool Value GreaterThan");
-        return false;
-      }
-      require(Pools[pool] > 0);
-      winner.transfer(Pools[pool]);
+      require(PoolValue[pool] > 0);
+      winner.transfer(PoolValue[pool]);
       PaymentMade(winner, address(this), PaymentCode.WinnerPayment);
       TotalPayouts -= Pools[pool];
-      Pools[pool] = 0;
+      PoolValue[pool] = 0;
   }
 
   function isAddressContractAdmin(address checkAddress) private view returns (bool) {

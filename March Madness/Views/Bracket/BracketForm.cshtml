@@ -77,7 +77,10 @@
 						method: 'POST',
 						data: entry,
 						success: function () {
-							alert('successfully added bracket');
+							MarchMadnessApp.ContractCalls.createBracket(results[0], MMStore.poolId, web3.eth.accounts[4])
+							.then(function () {alert('successfully added bracket');})
+							.catch(function (err) { console.log('saved to db but not chain', err) })
+							
 						},
 						failure: function (a, b, c, d) {
 							alert('failed');

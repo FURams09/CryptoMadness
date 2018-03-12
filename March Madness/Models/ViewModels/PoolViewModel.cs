@@ -13,6 +13,8 @@ namespace March_Madness.Models.ViewModels
 
 		public string Address { get; set; }
 
+		public string OwnerAddress { get; set; }
+
 		public decimal EntryFee { get; set; }
 	}
 }
