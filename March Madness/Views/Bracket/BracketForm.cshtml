@@ -24,9 +24,19 @@
 	<div style="z-index:99999;" class="form-group">
 		<button class="btn btn-primary btn-success" id="submitBracket">Save Bracket</button>
 	</div>
+	<div class="col-md-10">
+		<label class="col-md-2 control-label">Pool Id</label>
+		<input class="form-control" id="pool-id">
+	</div>
+	<div class="form-group">
+		<div class="col-md-offset-2 col-md-10">
+			<button value="" id="pay-winner" class="btn btn-default">Pay Winner</button>
+		</div>
+	</div>
 
 	<div class="form-group col">
-		<input id="bracket-owner-address" class="form-control" value="@Model.EntryAddress" disabled="disabled"  />
+		<label class="col-md-2 control-label">Entrant Address</label>
+		<input id="bracket-owner-address" class="form-control" />
 	</div>
 </div>
 
@@ -77,7 +87,7 @@
 						method: 'POST',
 						data: entry,
 						success: function () {
-							MarchMadnessApp.ContractCalls.createBracket(results[0], MMStore.poolId, web3.eth.accounts[4])
+							MarchMadnessApp.ContractCalls.createBracket(results[0], 1, $("#bracket-owner-address").val())
 							.then(function () {alert('successfully added bracket');})
 							.catch(function (err) { console.log('saved to db but not chain', err) })
 							
@@ -91,6 +101,14 @@
 					alert('All games must be selected.');
 				}
 			});
+
+			$('#pay-winner').on('click', function () {
+
+
+				MarchMadnessApp.ContractCalls.payWinner($('#bracket-owner-address').val(), $('#pool-id').val(), $('#crypto-madness').bracket('data').results[0], web3.eth.accounts[0]);
+
+			});
+
 
 			$('#bracket-selector').on('change', function () {
 				var $this = $(this);

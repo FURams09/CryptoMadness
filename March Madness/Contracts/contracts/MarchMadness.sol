@@ -146,7 +146,7 @@ contract MarchMadness {
 
 
   function createPool(uint16 pool, uint fee) public payable tournamentNotStarted {
-    // require(PoolOwners[pool] == 0x0);
+    require(PoolOwners[pool] == 0x0);
     if (msg.value < PoolFee) {
       PaymentError(msg.sender, ErrorCode.PoolFeeNotMet, "Insufficient fee to cover pool creation");
       return;
@@ -193,7 +193,7 @@ contract MarchMadness {
   }
  
 
-  function payWinner(address winner, uint16 pool, bytes32 bracket)  public payable isAdmin isPoolOwner(pool) returns(bool) {
+  function payWinner(address winner, uint16 pool, bytes32 bracket)  public payable isAdmin returns(bool) {
       if (bracket == 0) {
         PaymentError(winner, ErrorCode.NoBracketToValidate, "No Bracket Passed for Validation");
         return false;

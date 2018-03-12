@@ -15,7 +15,7 @@ MarchMadnessApp = {
         MarchMadnessApp.web3Provider = web3.currentProvider;
         } else {
         // If no injected web3 instance is detected, fall back to Ganache
-        var webProviderAddress = 'http://localhost:9545';
+        var webProviderAddress = 'http://localhost:7545';
         console.log('fallback URL in use. MetaMask not injected. local address: ' + webProviderAddress, )
 		MarchMadnessApp.web3Provider = new Web3.providers.HttpProvider(webProviderAddress);
         }
@@ -41,124 +41,96 @@ MarchMadnessApp = {
     hashBracket: function (bracket) {
         return web3.sha3(bracket.toString());
 	},
-	setInstaceVariables:  function () {
-		var march_madness = await MarchMadnessApp.contracts.MarchMadness.deployed(async function () {
-			MarchMadnessApp.poolFee = await march_madness.PoolFee.call({ from: web3.eth.accounts[0] }).then((poolFee) => { return poolFee.toNumber(); });
-			MarchMadnessApp.entryFee = await march_madness.EntryFee.call({ from: web3.eth.accounts[0] }).then((entryFee) => { return entryFee.toNumber(); });
-		})
+	setInstaceVariables: async function () {
+		var march_madness;
+		MarchMadnessApp.contracts.MarchMadness.deployed()
+			.then(function (instance) {
+				march_madness = instance;
+				console.log(march_madness);
+				return march_madness.PoolFee.call({ from: web3.eth.accounts[0] })
+			})
+			.then((poolFee) => {
+				MarchMadnessApp.poolFee = poolFee.toNumber();
+				return march_madness.EntryFee.call({ from: web3.eth.accounts[0] })
+			})
+			.then((entryFee) => {
+				MarchMadnessApp.entryFee = entryFee.toNumber();
+				return march_madness.SalesCommission.call({ from: web3.eth.accounts[0] })
+			})
+			.then((salesCommission) => {
+				MarchMadnessApp.SalesCommission = salesCommission.toNumber();
+			});
 	},
 	
     ContractCalls: {
-		createPool: async function (sender, poolId, poolEntryFee) {
+		createPool: async function (poolId, poolEntryFee, senderAddress) {
 			var march_madness = await MarchMadnessApp.contracts.MarchMadness.deployed();
-			//only for testing otherwise all pools will be poolId
-			poolId = poolId || 1
-			poolEntryFee = poolEntryFee || 0.025
-			await march_madness.createPool(poolId, poolEntryFee, { from: sender, gas: 1000000})
-			//start watch. does nothing yet
-			MarchMadnessApp.march_madness.createPool.watch(function (error, result) {
-				if (!error) {
-					console.log(result);
+			var createPoolWatch = march_madness.PoolCreated()
+			var createPoolErrorWatch = march_madness.PaymentError()
+			march_madness.createPool(poolId, web3.toWei(poolEntryFee, "ether"), { from: senderAddress, gas: 1000000, value: MarchMadnessApp.poolFee });
+
+			createPoolWatch.watch(function (err, res) {
+				if (!err) {
+					console.log(res);
 				}
-				else {
-					console.log(error);
+				console.log(err);
+			})
+			createPoolErrorWatch.watch(function (err, res) {
+				if (!err) {
+					console.log(res);
 				}
-			});
-			
+				console.log(err);
+			})
+
             
         },
-        getPoolBalance: function(poolId, caller) {
-            var MM;
-            MarchMadnessApp.contracts.MarchMadness.deployed()
-            .then(function(instance) {
-                MM = instance;
-                return MM.getPoolValueInEth(poolId, {from: caller})
-            })
-            .then(function(poolValue) {
-                console.log(poolValue.toNumber());
-            })
-            .catch(function(err) {
-                console.log(err)
-            });
-        },
-        createBracket: function(bracket, poolId, entrant) {
-			var MM;
+        getPoolBalance: async function(poolId) {
+			var march_madness = await MarchMadnessApp.contracts.MarchMadness.deployed();
+			return march_madness.getPoolValue.call(poolId, { from: web3.eth.accounts[0] });
+		},
+		getPoolEntryFee: async function (poolId) {
+			var march_madness = await MarchMadnessApp.contracts.MarchMadness.deployed();
+			return march_madness.getPoolEntryFee(poolId, {from: web3.eth.accounts[0]})
+		},
+		createBracket: async function (bracket, poolId, senderAddress) {
+			var march_madness = await MarchMadnessApp.contracts.MarchMadness.deployed();
+			var poolEntryFee = await march_madness.getPoolEntryFee(poolId, { from: senderAddress }).then((res) => { return res.toNumber(); });
 			var storableBracket = MarchMadnessApp.hashBracket(bracket)
-            MarchMadnessApp.contracts.MarchMadness.deployed()
-            .then(function(instance) {
-                MM = instance;
-				return MM.createBracket(storableBracket, MMStore.poolId, { from: entrant, value: parseInt(MMStore.entryFee) + parseInt(MMStore.poolEntryFee), gas: 50000  })
-            })
-            .then(function(success) {
-                if(success) {
-					console.log( success);
-                } else {
-                console.log('Bracket Creation Completed but not saved');
-                };
-            })
-            .catch(function(err) {
-                console.log(err)
-            });
-
+			var createBracketWatch = march_madness.BracketCreated();
+			march_madness.createBracket(storableBracket, poolId, { from: senderAddress, value: parseInt(MarchMadnessApp.entryFee) + parseInt(poolEntryFee), gas: 120000 })
+			createBracketWatch.watch(function (err, res) {
+				if (!err) {
+					console.log(res);
+				} else {
+					console.log(err);
+				}
+			})
         },
-        updateBracket: function(bracket, entrant) {
-			var MM;
+        payWinner: async function(winner, poolId, bracket, senderAddress) {
+			var march_madness = await MarchMadnessApp.contracts.MarchMadness.deployed();
 			var storableBracket = MarchMadnessApp.hashBracket(bracket);
-            MarchMadnessApp.contracts.MarchMadness.deployed()
-            .then(function(instance) {
-                MM = instance;
-				return MM.updateBracket(storableBracket, { from: entrant })
-            })
-            .then(function(success) {
-                if(success) {
-                    console.log(storableBracket, success);
-                } else {
-                    console.log('Bracket Update Completed but not saved');
-                };
-            })
-            .catch(function(err) {
-                console.log(err)
-            });
+			var payWinnerWatch = march_madness.PaymentMade();
+			var payErrorWatch = march_madness.PaymentError();
+			march_madness.payWinner(winner, poolId, storableBracket, { from: senderAddress, gas: 100000 })
+				.catch(function (err) {
+					console.log(err);
+				})
 
-        },
-        claimWinnings: function(winner, poolId, bracket) {
-            //call this to get your winnings but the winner pays the gas. otherwise wait for payment from Close
-            var MM;
-            MarchMadnessApp.contracts.MarchMadness.deployed()
-            .then(function(instance) {
-                MM = instance;
-                var storableBracket = this.hashBracket(bracket);
-                return MM.payWiner(winner, poolId, storableBracket, {from: winner, gasPrice: MMStore.gasPrice, gas: MMStore.maxGas})
-            })
-            .then(function(success) {
-                if(success) {
-                    console.log('Claim Paid');
-                } else {
-                    console.log('Bracket Update Completed but not saved');
-                };
-            })
-            .catch(function(err) {
-                console.log(err)
-            });
-        },
-        payWinnerFromAccount: function(winner, poolId, bracket, sender) {
-            var MM;
-            MarchMadnessApp.contracts.MarchMadness.deployed()
-            .then(function(instance) {
-                MM = instance;
-                var storableBracket = this.hashBracket(bracket);
-                return MM.updateBracket(winner, storableBracket, {from: sender, gasPrice: MMStore.gasPrice, gas: MMStore.maxGas})
-            })
-            .then(function(success) {
-                if(success) {
-                    console.log('Claim Paid from :' + sender);
-                } else {
-                    console.log('Bracket Update Completed but not saved');
-                };
-            })
-            .catch(function(err) {
-                console.log(err)
-            });
+			payWinnerWatch.watch(function (err, res) {
+				if (!err) {
+					console.log(res);
+				} else {
+					console.log(err);
+				}
+			});
+			payErrorWatch.watch(function (err, res) {
+				if (!err) {
+					console.log(res);
+				} else {
+					console.log(err);
+				}
+			})
+          
         },
         timeLeftUntilLock: function(sender) {
             var MM;
@@ -178,20 +150,12 @@ MarchMadnessApp = {
         }
     }, 
     Admin: {
-        withdraw: function(amount, recipient, approvingAdmin) {
-            var MM;
-            MarchMadnessApp.contracts.MarchMadness.deployed()
-            .then(function(instance) {
-                MM = instance;
-                return MM.withdrawFunds(recipient, amount, {from: approvingAdmin})
-            })
-            .then(function(success) {
-                if(success) {
-                    console.log('Withdral completed');
-                } else {
-                    console.log('Bracket Update Completed but not saved');
-                };
-            })
+        withdraw:  async function(amount, recipient, approvingAdmin) {
+            var march_madness = await MarchMadnessApp.contracts.MarchMadness.deployed()
+			var paymentWatch = march_madness.PaymentMade();
+			return march_madness.withdrawFunds(recipient, amount, {from: approvingAdmin})
+
+				paymentWatch
             .catch(function(err) {
                 console.log(err)
             });

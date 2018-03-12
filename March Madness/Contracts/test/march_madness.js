@@ -35,7 +35,7 @@ contract('MarchMadness', function(accounts) {
 
   it("should Initialize MarchMadness", function(done) {
     march_madness.PoolFee.call().then(function(poolFee) {
-      assert.equal(poolFee, MMStore.poolFee);
+      assert.equal(poolFee.toNumber(), web3.eth.toWei(MMStore.poolFee));
       done();
     })
   });
@@ -165,15 +165,28 @@ contract('MarchMadness', function(accounts) {
       assert.equal(pooltx.logs[0].event, 'PaymentError', "CreatedWithLowValue");
     })
     .catch(function(res) {
-      console.log(res);
+      //console.log(res);
     })
   })
+
+
 
   it("should get pool Entry Fee", async function(){
     var poolEntryFee = await march_madness.getPoolEntryFee.call(MMStore.poolId);
     assert.equal(poolEntryFee.toNumber(), MMStore.poolEntryFee)
   })
 
+  it("should not let pool be overridden", async function()  {
+    var wasCaught = await march_madness.createPool(MMStore.poolId, MMStore.poolEntryFee, {from: accounts[0], value: MMStore.poolFee} )
+    .then(function(res) {
+      return false;
+    })
+    .catch(function(res) {
+      return true;
+    })
+    assert.isTrue(wasCaught, "Existing Pool Recreated");
+  })
+  
   var bracketCreator = 2;
   it("should Create Bracket " + MMStore.bracketId, async function() {
     //chaning account as main bank
@@ -185,7 +198,6 @@ contract('MarchMadness', function(accounts) {
     assert.equal(pooltx.logs[0].args.poolId.toNumber(), MMStore.poolId, "PoolId mismatch");
     assert.equal(pooltx.logs[0].args.owner, accounts[bracketCreator], "Bracket Owner mismatch");
     assert.equal(pooltx.logs[0].args.bracket, MMStore.bracket, "Bracket mismatch");
-    console.log(pooltx.logs[0].args.bracket, MMStore.bracket)
     var poolBalance = await march_madness.getPoolValue.call(MMStore.poolId);
     assert.equal(poolBalance.toNumber(), poolEntryFee, 'Incorrect Fee Collected');
     return march_madness.createPool(MMStore.poolId, MMStore.poolEntryFee, {from: accounts[bracketCreator], value: 1} )
@@ -193,7 +205,7 @@ contract('MarchMadness', function(accounts) {
       expect(failedTx.logs[0].event).to.equal('PaymentError');
     })
     .catch(function (err) {
-      console.log(err)
+    //  console.log(err)
     });
   })
 
@@ -208,7 +220,7 @@ contract('MarchMadness', function(accounts) {
 
     return march_madness.payWinner(winnerAddress, winningPool, bracket, {from: accounts[5]})
     .then(function(badTx) {
-      console.log(badTx);
+     // console.log(badTx);
       assert.isTrue(false, "Non-Admin initiated pay");
     })
     .catch(function(err) {
