@@ -24,7 +24,7 @@ contract MarchMadness {
   
 
   mapping(bytes32 => bytes32) BracketStore; //EntryKey to bracket
-  mapping(bytes32 => address) BracketOwner; //maps an EntryKey to its owner
+  mapping(bytes32 => address) BracketOwnerPasswords; //maps an EntryKey to its owner
   mapping(bytes32 => bytes32) BracketEscrow; //Maps the NewOwner/TempPassword with the Bracket they're buying
 
   
@@ -50,7 +50,7 @@ contract MarchMadness {
 
   modifier isBracketOwner(string poolAddress, string poolPassword, string bracketPassword, bytes32 ) {
     var pool = getBracketOwnerHash(msg.sender, poolPassword);
-    getBracketOwnerHash(poolAddress, poolPassword, bracketPassword);
+    require pool == BracketOwnerPasswords[] ;
     _;
   }
 
@@ -149,12 +149,12 @@ contract MarchMadness {
     PoolValue[poolHash] = bonus;
     MaxPoolEntriesPerAddress[poolHash] = maxPerAddress; //Max Entries Per Address in each pool
     MaxPoolEntries[poolHash] = maxEntries; //total entries in each pool
-    PoolPublicNames[getPublicHash(msg.sender, publicName)] = poolHash; //makes a unique identifier of the Public Address and the Name. Makes Names not have to be unique, but still lookupable
+    PoolPublicNames[getPublicPoolHash(msg.sender, publicName)] = poolHash; //makes a unique identifier of the Public Address and the Name. Makes Names not have to be unique, but still lookupable
     PoolCreated(msg.sender, PoolFees[msg.sender]);
   }
 
   function getPoolValue(address poolAddress, string publicName) public view returns (uint) {
-    var poolKey = getPublicHash(poolAddress, publicName);
+    var poolKey = getPublicPoolHash(poolAddress, publicName);
     return PoolValue[poolKey];
   }
 
@@ -182,6 +182,7 @@ contract MarchMadness {
 
     var entryKey = getBracketOwnerHash(poolAddress, poolPassword, bracketPassword);
     BracketStore[entryKey] = bracket;
+    BracketPassword[]
     TotalPayouts += poolEntryFee;
     PoolValue[poolHash] += poolEntryFee;
     BracketCreated(msg.sender, poolAddress);
@@ -205,6 +206,7 @@ contract MarchMadness {
         return false;
       }
 
+
       require(PoolValue[pool] > 0);
       winner.transfer(PoolValue[pool]);
       PaymentMade(winner, msg.sender, "Winner Paid");
@@ -212,7 +214,7 @@ contract MarchMadness {
       PoolValue[pool] = 0;
   }
 
-  function getPublicHash(address poolAddress, string name) private pure returns(bytes32) {
+  function getPublicPoolHash(address poolAddress, string name) private pure returns(bytes32) {
     return sha3(poolAddress, name);
   }
   function getBracketOwnerHash(address poolAddress, string poolPassword, string bracketPassword) private pure returns (bytes32) {
