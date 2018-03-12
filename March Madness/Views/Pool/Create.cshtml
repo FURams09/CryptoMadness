@@ -19,8 +19,8 @@
 		</div>*@
 	<div class="form-group">
 		<div class="col-md-10">
-			<label class="col-md-2 control-label">Pool Id</label>
-			<input class="form-control" id="pool-id">
+			<label class="col-md-2 control-label">Pool Password</label>
+			<input class="form-control" id="password">
 		</div>
 	</div>
 	<div class="form-group">
@@ -72,7 +72,8 @@
 					return false;
 				}
 
-				MarchMadnessApp.ContractCalls.createPool($('#pool-id').val(), $('#entry-fee').val(), $('#pool-owner-address').val()  );
+				var ownerAddress 
+				MarchMadnessApp.ContractCalls.createPool($('#Password').val(), $('#entry-fee').val(),   );
 
 				//if (confirm('Once Created You won\'t be able to change the password or change the Fee. If the fee is 0 there will be no reward for this pool. If there\'s no address one will be created')) {
 				//	var pw = 'c87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3';
@@ -91,6 +92,7 @@
 				//	});
 				//}
 			});
+
 
 			
 		})
